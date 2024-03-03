@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "parse.project.assets": {
+      "commandName": "Project",
+      "commandLineArgs": "-p ADO.Net.Client.Implementation \r\n-f C:\\Users\\ajacs\\source\\repos\\parse.project.assets\\parse.project.assets\\FilesToParse\\project.assets.json\r\n"
+    }
+  }
+}
