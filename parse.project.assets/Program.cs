@@ -21,6 +21,8 @@ internal class Program
         string jsonStr = string.Empty;// = "C:\\Users\\ajacs\\source\\repos\\parse.project.assets\\parse.project.assets\\FilesToParse\\project.assets.json";
         //var jsonStr = "\\FilesToParse\\project.assets.json";
 
+        string dotNetVersion = "net6.0";
+
 
         Parser.Default.ParseArguments<Options>(args)
              .WithParsed<Options>(o =>
@@ -37,9 +39,9 @@ internal class Program
 
         var parsed = JObject.Parse(json);
 
-        List<Package> packages = GetPackages(parsed);
+        List<Package> packages = GetPackages(parsed, dotNetVersion);
 
-        List<Dependency> topDependencies = GetTopDependencies(parsed);
+        List<Dependency> topDependencies = GetTopDependencies(parsed, dotNetVersion);
 
         //foreach (Dependency dependency in topDependencies)
         //{
@@ -105,9 +107,9 @@ internal class Program
         return sb.ToString();
     }
 
-    static List<Dependency> GetTopDependencies(JObject parsed)
+    static List<Dependency> GetTopDependencies(JObject parsed, string dotNetVersion)
     {
-        var dIdList = parsed["projectFileDependencyGroups"]["net6.0"]
+        var dIdList = parsed["projectFileDependencyGroups"][dotNetVersion]
             //.Select(x => (JObject)x)
             .ToList();
 
@@ -130,9 +132,9 @@ internal class Program
         return topDependencies;
     }
 
-    static List<Package> GetPackages(JObject parsed)
+    static List<Package> GetPackages(JObject parsed, string dotNetVersion)
     {
-        List<JProperty> dIdList = parsed["targets"]["net6.0"]
+        List<JProperty> dIdList = parsed["targets"][dotNetVersion]
             .Select(x => (JProperty)x)
             .ToList();
 
