@@ -1,82 +1,84 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using CommandLine;
 using Newtonsoft.Json.Linq;
-using parse.project.assets;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.Principal;
 using System.Text;
 
 namespace parse.project.assets;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static int Main(string[] args)
     {
-        //string target = "ADO.Net.Client";
-        string target = string.Empty;// = "System.Security.Principal.Windows";
-
-
-        string jsonStr = string.Empty;// = "C:\\Users\\ajacs\\source\\repos\\parse.project.assets\\parse.project.assets\\FilesToParse\\project.assets.json";
-        //var jsonStr = "\\FilesToParse\\project.assets.json";
-
+        string target = string.Empty;
+        string jsonStr = string.Empty;
         string dotNetVersion = "net6.0";
-
 
         Parser.Default.ParseArguments<Options>(args)
              .WithParsed<Options>(o =>
              {
                  target = o.PackageName;
                  jsonStr = o.ProjectAssetsJsonFile;
+                 if (!string.IsNullOrWhiteSpace(o.Version))
+                 {
+                     dotNetVersion = o.Version;
+                 }
              });
-
-        string json;
-        using (StreamReader r = new StreamReader(jsonStr))
-        {
-            json = r.ReadToEnd();
-        }
-
-        var parsed = JObject.Parse(json);
-
-        List<Package> packages = GetPackages(parsed, dotNetVersion);
-
-        List<Dependency> topDependencies = GetTopDependencies(parsed, dotNetVersion);
-
-        //foreach (Dependency dependency in topDependencies)
-        //{
-        //    Console.WriteLine($"{dependency.Name} {dependency.Version}");
-        //}
-
-
-        //Console.WriteLine($"Looking for {target}\r\n");
-
-        //var flist = packages.Where(x => x.HasDependencyWithName(target)).ToList();
-
-        ////foreach (var p in packages)
-        //foreach (var p in flist)
-        //{
-        //    Console.WriteLine($"{p.Name} {p.Version}");
-        //    foreach (var dd in p.Dependencies)
-        //    {
-        //        Console.WriteLine($"\t{dd.Name} {dd.Version}");
-        //    }
-        //}
 
         Console.WriteLine($"Target: {target}");
         Console.WriteLine($"Project File: {jsonStr}");
+        Console.WriteLine($".NET version: {dotNetVersion}");
         Console.WriteLine("");
 
-        //Console.WriteLine("");
-        //Console.WriteLine(new string('=', 50));
-        //Console.WriteLine("");
+        if (!File.Exists(jsonStr))
+        {
+            Console.WriteLine($"Didn't find the file {jsonStr}");
+            return 1;
+        }
+
+        JObject jsonContent = ReadFileIntoJObject(jsonStr);
+
+        if (!DotNetVersionSupported(dotNetVersion, jsonContent))
+        {
+            Console.WriteLine($"Didn't find support for the .NET version {dotNetVersion}");
+            return 1;
+        }
+
+        List<Dependency> topDependencies = GetTopDependencies(jsonContent, dotNetVersion);
+
+        List<Package> packages = GetPackages(jsonContent, dotNetVersion);
 
         string output = ParentsString(target, packages, topDependencies, string.Empty, 0);
+
+        if (string.IsNullOrWhiteSpace(output))
+        {
+            Console.WriteLine($"Nothing found for {target}");
+            return 1;
+        }
 
         Console.WriteLine($"{string.Empty.PadRight(60)}\tExpect\tActual\tTop?");
         Console.WriteLine($"{string.Empty.PadRight(60)}\t======\t======\t====");
         Console.Write(output);
 
+        return 0;
+    }
+
+    private static bool DotNetVersionSupported(string dotNetVersion, JObject jsonContent)
+    {
+        bool projectFileDependencyGroups = ((JObject)jsonContent["projectFileDependencyGroups"]).ContainsKey(dotNetVersion);
+        bool targets = ((JObject)jsonContent["targets"]).ContainsKey(dotNetVersion);
+        return projectFileDependencyGroups && targets;
+    }
+
+    private static JObject ReadFileIntoJObject(string jsonStr)
+    {
+        string textContent;
+        using (StreamReader r = new StreamReader(jsonStr))
+        {
+            textContent = r.ReadToEnd();
+        }
+
+        var jsonContent = JObject.Parse(textContent);
+        return jsonContent;
     }
 
     static string ParentsString(string target, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount)
