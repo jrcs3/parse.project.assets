@@ -47,6 +47,8 @@ internal class Program
 
         List<Package> packages = GetPackages(jsonContent, dotNetVersion);
 
+        target = CorrectTarget(target, packages);
+
         string output = ParentsString(target, packages, topDependencies, string.Empty, 0);
 
         if (string.IsNullOrWhiteSpace(output))
@@ -60,6 +62,17 @@ internal class Program
         Console.Write(output);
 
         return 0;
+    }
+
+    private static string CorrectTarget(string target, List<Package> packages)
+    {
+        string? correctedName = packages.Where(x => x.Name.Trim().ToLower() == target.Trim().ToLower()).FirstOrDefault()?.Name;
+        if (!string.IsNullOrWhiteSpace(correctedName))
+        {
+            target = correctedName;
+        }
+
+        return target;
     }
 
     private static bool DotNetVersionSupported(string dotNetVersion, JObject jsonContent)
