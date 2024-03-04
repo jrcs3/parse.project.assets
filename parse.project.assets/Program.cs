@@ -108,16 +108,13 @@ internal class Program
 
         if (topDependencies.Where(x => x.Name == target).Any())
         {
-            sb.AppendLine("\t X");
+            sb.Append("\t X");
         }
-        else
+        sb.AppendLine("");
+        var flist = packages.Where(x => x.HasDependencyWithName(target)).ToList();
+        foreach (var p in flist)
         {
-            sb.AppendLine("");
-            var flist = packages.Where(x => x.HasDependencyWithName(target)).ToList();
-            foreach (var p in flist)
-            {
-                sb.Append(ParentsString(p.Name, packages, topDependencies, p.Version, tabCount + 1));
-            }
+            sb.Append(ParentsString(p.Name, packages, topDependencies, p.Version, tabCount + 1));
         }
         return sb.ToString();
     }

@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "parse.project.assets": {
-      "commandName": "Project",
-      "commandLineArgs": "-p System.Security.Principal.windows \r\n-f C:\\Users\\ajacs\\source\\repos\\parse.project.assets\\parse.project.assets\\FilesToParse\\project.assets.json -v net6.0\r\n"
-    }
-  }
-}
