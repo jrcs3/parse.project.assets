@@ -7,8 +7,8 @@ So here it is.
 
 ## Example
 
-```cmd
-C:\FilesToParse>parse.project.assets -f project.assets.json -p System.Security.Principal.windows -l 1
+```shell
+C:\FilesToParse>parse.project.assets -f project.assets.json -p System.Security.Principal.windows
 
 Package      : System.Security.Principal.windows
 File         : C:\FilesToParse\project.assets.json
