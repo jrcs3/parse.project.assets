@@ -5,6 +5,15 @@ At work we are trying to only replace existing Top Level NuGet packages and only
 I was reading through `project.assets.json` for Dot Net Core apps and though it wouldn't be that hard to automate it.
 So here it is.
 
+## Command Line Switches
+
+| Short | Long            | Required? | Purpose                         | Default
+|-------|-----------------|-----------|---------------------------------|-
+| -p    | --package       |  X        | The NuGet package to scan for   | 
+| -f    | --file          |           | The file to scan                | `project.assets.json` in the curent directory
+| -d    | --dotnetversion |           | .Net Version                    | `net6.0`
+| -l    | --levels        |           | Levels Deep to graph            | All Levels (`int.MaxValue`)
+
 ## Example
 
 ```shell
@@ -26,11 +35,6 @@ System.Security.Principal.Windows                                       4.7.0
 C:\FilesToParse>
 ```
 
-## Command Line Swithes
-
-| Short | Long            | Required? | Purpose
-|-------|-----------------|-----------|-
-| -p    | --package       |  X        | The NuGet package to scan for
-| -f    | --file          |           | The file to scan
-| -d    | --dotnetversion |           | .Net Version
-| -l    | --levels        |           | Levels Deep to graph
+- Top? : `X` = This is a Top-level Package 
+- Version : The version of this package
+- Child : the version requested for the dependency  
