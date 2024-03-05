@@ -1,5 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-using CommandLine;
+﻿using CommandLine;
 using Newtonsoft.Json.Linq;
 using System.Text;
 
@@ -9,33 +8,43 @@ internal class Program
 {
     private static int Main(string[] args)
     {
-        string target = string.Empty;
-        string jsonStr = string.Empty;
+        string packageName = string.Empty;
+        string fileName = string.Empty;
         string dotNetVersion = "net6.0";
+        int levels = int.MaxValue;
 
         Parser.Default.ParseArguments<Options>(args)
-             .WithParsed<Options>(o =>
+             .WithParsed(o =>
              {
-                 target = o.PackageName;
-                 jsonStr = o.ProjectAssetsJsonFile;
+                 packageName = o.PackageName;
+                 fileName = GetFileName(o);
+
                  if (!string.IsNullOrWhiteSpace(o.Version))
                  {
                      dotNetVersion = o.Version;
                  }
+                 if (o.Levels.HasValue)
+                 {
+                     levels = o.Levels.Value;
+                 }
              });
 
-        Console.WriteLine($"Target: {target}");
-        Console.WriteLine($"Project File: {jsonStr}");
-        Console.WriteLine($".NET version: {dotNetVersion}");
+        Console.WriteLine($"Package      : {packageName}");
+        Console.WriteLine($"File         : {fileName}");
+        Console.WriteLine($".NET version : {dotNetVersion}");
+        if (levels != int.MaxValue)
+        {
+            Console.WriteLine($"Levels       : {levels}");
+        }
         Console.WriteLine("");
 
-        if (!File.Exists(jsonStr))
+        if (!File.Exists(fileName))
         {
-            Console.WriteLine($"Didn't find the file {jsonStr}");
+            Console.WriteLine($"Didn't find the file {fileName}");
             return 1;
         }
 
-        JObject jsonContent = ReadFileIntoJObject(jsonStr);
+        JObject jsonContent = ReadFileIntoJObject(fileName);
 
         if (!DotNetVersionSupported(dotNetVersion, jsonContent))
         {
@@ -47,21 +56,56 @@ internal class Program
 
         List<Package> packages = GetPackages(jsonContent, dotNetVersion);
 
-        target = CorrectTarget(target, packages);
+        packageName = CorrectTarget(packageName, packages);
 
-        string output = ParentsString(target, packages, topDependencies, string.Empty, 0);
+        string output = ParentsString(packageName, packages, topDependencies, string.Empty, 0, levels);
 
         if (string.IsNullOrWhiteSpace(output))
         {
-            Console.WriteLine($"Nothing found for {target}");
+            Console.WriteLine($"Nothing found for {packageName}");
             return 1;
         }
 
-        Console.WriteLine($"{string.Empty.PadRight(60)}\tExpect\tActual\tTop?");
-        Console.WriteLine($"{string.Empty.PadRight(60)}\t======\t======\t====");
+        if (levels < 1)
+        {
+            Console.WriteLine($"Invalid Levels, {levels} doesn't make sense.");
+            return 1;
+        }
+
+        Console.WriteLine($"{string.Empty,-60}\tTop?\tVersion\tChild");
+        Console.WriteLine($"{string.Empty,-60}\t====\t=======\t=====");
         Console.Write(output);
 
         return 0;
+    }
+
+    private static string GetFileName(Options o)
+    {
+        string fileName = string.Empty;
+        if (string.IsNullOrWhiteSpace(o.ProjectAssetsJsonFile))
+        {
+            string path = Directory.GetCurrentDirectory();
+            string tempFileName = Path.Combine(path, "project.assets.json");
+            if (File.Exists(tempFileName))
+            {
+                fileName = tempFileName;
+            }
+        }
+        else if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(o.ProjectAssetsJsonFile)) 
+            && Path.GetExtension(o.ProjectAssetsJsonFile).ToLower() == ".json")
+        {
+            string path = Directory.GetCurrentDirectory();
+            fileName = Path.Combine(path, o.ProjectAssetsJsonFile);
+        }
+        else if (Path.GetExtension(o.ProjectAssetsJsonFile).ToLower() != ".json")
+        {
+            fileName = Path.Combine(o.ProjectAssetsJsonFile, "project.assets.json");
+        }
+        else
+        {
+            fileName = o.ProjectAssetsJsonFile;
+        }
+        return fileName;
     }
 
     private static string CorrectTarget(string target, List<Package> packages)
@@ -85,7 +129,7 @@ internal class Program
     private static JObject ReadFileIntoJObject(string jsonStr)
     {
         string textContent;
-        using (StreamReader r = new StreamReader(jsonStr))
+        using (StreamReader r = new(jsonStr))
         {
             textContent = r.ReadToEnd();
         }
@@ -94,38 +138,38 @@ internal class Program
         return jsonContent;
     }
 
-    static string ParentsString(string target, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount)
+    private static string ParentsString(string target, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels)
     {
+        if (tabCount > levels)
+        {
+            return string.Empty;
+        }
         StringBuilder sb = new();
-        string tabs = tabCount == 0 ? string.Empty : new string(' ', tabCount * 4);
+        string tabs = tabCount == 0 ? string.Empty : new string(' ', tabCount * 2);
         Package? meItem = packages.Where(x => x.Name == target).ToList().FirstOrDefault();
 
         string actualVersion = meItem != null ? meItem.Version : string.Empty;
+        string topLevelX = topDependencies.Where(x => x.Name == target).Any() ? " X" : string.Empty;
 
         string stringToAdd = $"{tabs}{target}".PadRight(60);
-        sb.Append($"{stringToAdd}\t{version}\t{actualVersion}");
-        System.Diagnostics.Debug.WriteLine($"{target}\t{tabCount}");
+        sb.AppendLine($"{stringToAdd}\t{topLevelX}\t{actualVersion}\t{version}");
 
-        if (topDependencies.Where(x => x.Name == target).Any())
-        {
-            sb.Append("\t X");
-        }
-        sb.AppendLine("");
         var flist = packages.Where(x => x.HasDependencyWithName(target)).ToList();
         foreach (var p in flist)
         {
-            sb.Append(ParentsString(p.Name, packages, topDependencies, p.Version, tabCount + 1));
+            string childVersion = p.Dependencies.Where(x => x.Name == target).FirstOrDefault()?.Version ?? string.Empty;
+            sb.Append(ParentsString(p.Name, packages, topDependencies, childVersion, tabCount + 1, levels));
         }
         return sb.ToString();
     }
 
-    static List<Dependency> GetTopDependencies(JObject parsed, string dotNetVersion)
+    private static List<Dependency> GetTopDependencies(JObject parsed, string dotNetVersion)
     {
         var dIdList = parsed["projectFileDependencyGroups"][dotNetVersion]
             //.Select(x => (JObject)x)
             .ToList();
 
-        List<Dependency> topDependencies = new List<Dependency>();
+        List<Dependency> topDependencies = new();
 
         foreach (JToken? d in dIdList)
         {
@@ -144,13 +188,13 @@ internal class Program
         return topDependencies;
     }
 
-    static List<Package> GetPackages(JObject parsed, string dotNetVersion)
+    private static List<Package> GetPackages(JObject parsed, string dotNetVersion)
     {
         List<JProperty> dIdList = parsed["targets"][dotNetVersion]
             .Select(x => (JProperty)x)
             .ToList();
 
-        List<Package> packages = new List<Package>();
+        List<Package> packages = new();
 
         foreach (var d in dIdList)
         {
@@ -184,5 +228,4 @@ internal class Program
 
         return packages;
     }
-
 }
