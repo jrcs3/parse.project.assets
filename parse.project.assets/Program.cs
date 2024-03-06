@@ -53,12 +53,11 @@ internal class Program
         }
 
         List<Dependency> topDependencies = GetTopDependencies(jsonContent, dotNetVersion);
-
         List<Package> packages = GetPackages(jsonContent, dotNetVersion);
 
         packageName = CorrectTarget(packageName, packages);
 
-        string output = ParentsString(packageName, packages, topDependencies, string.Empty, 0, levels);
+        string output = ParentsStringText(packageName, packages, topDependencies, string.Empty, 0, levels);
 
         if (string.IsNullOrWhiteSpace(output))
         {
@@ -72,12 +71,78 @@ internal class Program
             return 1;
         }
 
-        Console.WriteLine($"{string.Empty,-60}\tTop?\tVersion\tChild");
-        Console.WriteLine($"{string.Empty,-60}\t====\t=======\t=====");
         Console.Write(output);
 
         return 0;
     }
+
+    private static string ParentsStringText(string target, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels)
+    {
+        MakeLine makeLine = MakeLineText;
+        MakeHead makeHead = MakeHeaderText;
+        MakeFooter makeFooter = MakeFooterText;
+
+        if (tabCount > levels)
+        {
+            return string.Empty;
+        }
+        StringBuilder sb = new();
+
+        Package? meItem = packages.Where(x => x.Name == target).ToList().FirstOrDefault();
+
+        string actualVersion = meItem != null ? meItem.Version : string.Empty;
+        bool isTopLevel = topDependencies.Where(x => x.Name == target).Any();
+
+        sb.AppendLine(makeLine(target, version, actualVersion, tabCount, isTopLevel));
+
+        var flist = packages.Where(x => x.HasDependencyWithName(target)).ToList();
+        foreach (var p in flist)
+        {
+            string childVersion = p.Dependencies.Where(x => x.Name == target).FirstOrDefault()?.Version ?? string.Empty;
+            sb.Append(ParentsStringText(p.Name, packages, topDependencies, childVersion, tabCount + 1, levels));
+        }
+
+        string header = string.Empty;
+        string footer = string.Empty;
+        if (tabCount == 0 && sb.Length > 0)
+        {
+            header = makeHead();
+            footer = makeFooter();
+        }
+
+        return header + sb.ToString() + footer;
+    }
+
+    #region MakeFooter
+    private delegate string MakeFooter();
+
+    private static string MakeFooterText()
+    {
+        return string.Empty;
+    }
+    #endregion MakeHeader
+
+    #region MakeHeader
+    private delegate string MakeHead();
+
+    private static string MakeHeaderText()
+    {
+        return $"{string.Empty,-60}\tTop?\tVersion\tChild\r\n{string.Empty,-60}\t====\t=======\t=====\r\n"; 
+    }
+    #endregion MakeHeader
+
+    #region MakeLine
+    private delegate string MakeLine(string target, string version, string actualVersion, int tabCount, bool isTopLevel);
+
+    private static string MakeLineText(string target, string version, string actualVersion, int tabCount, bool isTopLevel)
+    {
+        string tabs = tabCount == 0 ? string.Empty : new string(' ', tabCount * 2);
+        string topLevelX = isTopLevel ? " X" : string.Empty;
+        string stringToAdd = $"{tabs}{target}".PadRight(60);
+        string stringToAddWIthVersions = $"{stringToAdd}\t{topLevelX}\t{actualVersion}\t{version}";
+        return stringToAddWIthVersions;
+    }
+    #endregion MakeLine
 
     private static string GetFileName(Options o)
     {
@@ -115,7 +180,6 @@ internal class Program
         {
             target = correctedName;
         }
-
         return target;
     }
 
@@ -136,31 +200,6 @@ internal class Program
 
         var jsonContent = JObject.Parse(textContent);
         return jsonContent;
-    }
-
-    private static string ParentsString(string target, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels)
-    {
-        if (tabCount > levels)
-        {
-            return string.Empty;
-        }
-        StringBuilder sb = new();
-        string tabs = tabCount == 0 ? string.Empty : new string(' ', tabCount * 2);
-        Package? meItem = packages.Where(x => x.Name == target).ToList().FirstOrDefault();
-
-        string actualVersion = meItem != null ? meItem.Version : string.Empty;
-        string topLevelX = topDependencies.Where(x => x.Name == target).Any() ? " X" : string.Empty;
-
-        string stringToAdd = $"{tabs}{target}".PadRight(60);
-        sb.AppendLine($"{stringToAdd}\t{topLevelX}\t{actualVersion}\t{version}");
-
-        var flist = packages.Where(x => x.HasDependencyWithName(target)).ToList();
-        foreach (var p in flist)
-        {
-            string childVersion = p.Dependencies.Where(x => x.Name == target).FirstOrDefault()?.Version ?? string.Empty;
-            sb.Append(ParentsString(p.Name, packages, topDependencies, childVersion, tabCount + 1, levels));
-        }
-        return sb.ToString();
     }
 
     private static List<Dependency> GetTopDependencies(JObject parsed, string dotNetVersion)
@@ -184,7 +223,6 @@ internal class Program
                 topDependencies.Add(new Dependency(name, version));
             }
         }
-
         return topDependencies;
     }
 
@@ -225,7 +263,6 @@ internal class Program
                 }
             }
         }
-
         return packages;
     }
 }
