@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Newtonsoft.Json.Linq;
+using parse.project.assets.Formatters;
 using System.Text;
 
 namespace parse.project.assets;
@@ -12,6 +13,7 @@ internal class Program
         string fileName = string.Empty;
         string dotNetVersion = "net6.0";
         int levels = int.MaxValue;
+        FormatOptions format = FormatOptions.Text;
 
         Parser.Default.ParseArguments<Options>(args)
              .WithParsed(o =>
@@ -27,16 +29,12 @@ internal class Program
                  {
                      levels = o.Levels.Value;
                  }
+                 format = o.Format;
              });
 
-        Console.WriteLine($"Package      : {packageName}");
-        Console.WriteLine($"File         : {fileName}");
-        Console.WriteLine($".NET version : {dotNetVersion}");
-        if (levels != int.MaxValue)
-        {
-            Console.WriteLine($"Levels       : {levels}");
-        }
-        Console.WriteLine("");
+        IOutputFormatter formatter = GetFormatter(format);
+
+        Console.Write(formatter.MakeJobDescription(packageName, fileName, dotNetVersion, levels));
 
         if (!File.Exists(fileName))
         {
@@ -57,7 +55,7 @@ internal class Program
 
         packageName = CorrectTarget(packageName, packages);
 
-        string output = ParentsStringText(packageName, packages, topDependencies, string.Empty, 0, levels);
+        string output = ParentsStringText(packageName, packages, topDependencies, string.Empty, 0, levels, formatter);
 
         if (string.IsNullOrWhiteSpace(output))
         {
@@ -76,11 +74,44 @@ internal class Program
         return 0;
     }
 
-    private static string ParentsStringText(string target, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels)
+    private static IOutputFormatter GetFormatter(FormatOptions format)
     {
-        MakeLine makeLine = MakeLineText;
-        MakeHead makeHead = MakeHeaderText;
-        MakeFooter makeFooter = MakeFooterText;
+        IOutputFormatter formatter;
+        switch (format)
+        {
+            case FormatOptions.Text:
+                formatter = new TextFormatter();
+                break;
+            case FormatOptions.CSV:
+                formatter = new CsvFormatter();
+                break;
+            default:
+                throw new Exception($"invalid format {format}");
+        }
+
+        return formatter;
+    }
+
+    private static string JobDescription(string packageName, string fileName, string dotNetVersion, int levels)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine($"Package      : {packageName}");
+        sb.AppendLine($"File         : {fileName}");
+        sb.AppendLine($".NET version : {dotNetVersion}");
+        if (levels != int.MaxValue)
+        {
+            sb.AppendLine($"Levels       : {levels}");
+        }
+        sb.AppendLine("");
+        string superHeader = sb.ToString();
+        return superHeader;
+    }
+
+    private static string ParentsStringText(string target, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
+    {
+        //MakeLine makeLine = MakeLineText;
+        //MakeHead makeHead = MakeHeaderText;
+        //MakeFooter makeFooter = MakeFooterText;
 
         if (tabCount > levels)
         {
@@ -93,56 +124,25 @@ internal class Program
         string actualVersion = meItem != null ? meItem.Version : string.Empty;
         bool isTopLevel = topDependencies.Where(x => x.Name == target).Any();
 
-        sb.AppendLine(makeLine(target, version, actualVersion, tabCount, isTopLevel));
+        sb.AppendLine(formatter.MakeLine(target, version, actualVersion, tabCount, isTopLevel));
 
         var flist = packages.Where(x => x.HasDependencyWithName(target)).ToList();
         foreach (var p in flist)
         {
             string childVersion = p.Dependencies.Where(x => x.Name == target).FirstOrDefault()?.Version ?? string.Empty;
-            sb.Append(ParentsStringText(p.Name, packages, topDependencies, childVersion, tabCount + 1, levels));
+            sb.Append(ParentsStringText(p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, formatter));
         }
 
         string header = string.Empty;
         string footer = string.Empty;
         if (tabCount == 0 && sb.Length > 0)
         {
-            header = makeHead();
-            footer = makeFooter();
+            header = formatter.MakeHead();
+            footer = formatter.MakeFooter();
         }
 
         return header + sb.ToString() + footer;
     }
-
-    #region MakeFooter
-    private delegate string MakeFooter();
-
-    private static string MakeFooterText()
-    {
-        return string.Empty;
-    }
-    #endregion MakeHeader
-
-    #region MakeHeader
-    private delegate string MakeHead();
-
-    private static string MakeHeaderText()
-    {
-        return $"{string.Empty,-60}\tTop?\tVersion\tChild\r\n{string.Empty,-60}\t====\t=======\t=====\r\n"; 
-    }
-    #endregion MakeHeader
-
-    #region MakeLine
-    private delegate string MakeLine(string target, string version, string actualVersion, int tabCount, bool isTopLevel);
-
-    private static string MakeLineText(string target, string version, string actualVersion, int tabCount, bool isTopLevel)
-    {
-        string tabs = tabCount == 0 ? string.Empty : new string(' ', tabCount * 2);
-        string topLevelX = isTopLevel ? " X" : string.Empty;
-        string stringToAdd = $"{tabs}{target}".PadRight(60);
-        string stringToAddWIthVersions = $"{stringToAdd}\t{topLevelX}\t{actualVersion}\t{version}";
-        return stringToAddWIthVersions;
-    }
-    #endregion MakeLine
 
     private static string GetFileName(Options o)
     {
