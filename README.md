@@ -7,12 +7,13 @@ So here it is.
 
 ## Command Line Switches
 
-| Short | Long            | Required? | Purpose                         | Default
-|-------|-----------------|-----------|---------------------------------|-
-| -p    | --package       |  X        | The NuGet package to scan for   | 
-| -f    | --file          |           | The file to scan                | `project.assets.json` in the curent directory
-| -d    | --dotnetversion |           | .Net Version                    | `net6.0`
-| -l    | --levels        |           | Levels Deep to graph            | All Levels (`int.MaxValue`)
+| Switch                | Required? | Purpose                            | Default/Notes
+|-----------------------|-----------|------------------------------------|-
+| -p    --package       |  X        | The NuGet package to scan for      | 
+| -f    --file          |           | The file to scan                   | `project.assets.json` in the curent directory
+| -d    --dotnetversion |           | .Net Version                       | `net6.0`
+| -l    --levels        |           | Levels Deep to graph               | All Levels (`int.MaxValue`)
+| -r    --format        |           | Format of the output (Text or CSV) | `Text` / is case sensitive, only `Text` and `CSV`
 
 ## Example
 
