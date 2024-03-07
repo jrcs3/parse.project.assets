@@ -2,6 +2,7 @@
 
 public enum FormatOptions
 {
-    Text,
-    CSV
+    text,
+    csv,
+    mermaid
 }

@@ -13,7 +13,7 @@ So here it is.
 | -f    --file          |           | The file to scan                   | `project.assets.json` in the curent directory
 | -d    --dotnetversion |           | .Net Version                       | `net6.0`
 | -l    --levels        |           | Levels Deep to graph               | All Levels (`int.MaxValue`)
-| -r    --format        |           | Format of the output (Text or CSV) | `Text` / is case sensitive, only `Text` and `CSV`
+| -r    --format        |           | Format of the output (Text or CSV) | `text` / is case sensitive, only `text` and `csv`
 
 ## Example
 
@@ -39,3 +39,7 @@ C:\FilesToParse>
 - Top? : `X` = This is a Top-level Package 
 - Version : The version of this package
 - Child : the version requested for the dependency  
+
+## Mermaid
+
+https://mermaid.live/

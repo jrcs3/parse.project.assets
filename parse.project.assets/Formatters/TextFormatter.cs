@@ -24,7 +24,7 @@ namespace parse.project.assets.Formatters
             return $"{string.Empty,-60}\tTop?\tVersion\tChild\r\n{string.Empty,-60}\t====\t=======\t=====\r\n";
         }
 
-        public string MakeLine(string packageName, string version, string actualVersion, int tabCount, bool isTopLevel)
+        public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel)
         {
             string tabs = tabCount == 0 ? string.Empty : new string(' ', tabCount * 2);
             string topLevelX = isTopLevel ? " X" : string.Empty;

@@ -13,7 +13,7 @@ internal class Program
         string fileName = string.Empty;
         string dotNetVersion = "net6.0";
         int levels = int.MaxValue;
-        FormatOptions format = FormatOptions.Text;
+        FormatOptions format = FormatOptions.text;
 
         Parser.Default.ParseArguments<Options>(args)
              .WithParsed(o =>
@@ -55,7 +55,7 @@ internal class Program
 
         packageName = CorrectTarget(packageName, packages);
 
-        string output = ParentsStringText(packageName, packages, topDependencies, string.Empty, 0, levels, formatter);
+        string output = ParentsStringText(string.Empty, packageName, packages, topDependencies, string.Empty, 0, levels, formatter);
 
         if (string.IsNullOrWhiteSpace(output))
         {
@@ -79,11 +79,14 @@ internal class Program
         IOutputFormatter formatter;
         switch (format)
         {
-            case FormatOptions.Text:
+            case FormatOptions.text:
                 formatter = new TextFormatter();
                 break;
-            case FormatOptions.CSV:
+            case FormatOptions.csv:
                 formatter = new CsvFormatter();
+                break;
+            case FormatOptions.mermaid:
+                formatter = new MermaidFormatter();
                 break;
             default:
                 throw new Exception($"invalid format {format}");
@@ -107,30 +110,26 @@ internal class Program
         return superHeader;
     }
 
-    private static string ParentsStringText(string target, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
+    private static string ParentsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
     {
-        //MakeLine makeLine = MakeLineText;
-        //MakeHead makeHead = MakeHeaderText;
-        //MakeFooter makeFooter = MakeFooterText;
-
         if (tabCount > levels)
         {
             return string.Empty;
         }
         StringBuilder sb = new();
 
-        Package? meItem = packages.Where(x => x.Name == target).ToList().FirstOrDefault();
+        Package? meItem = packages.Where(x => x.Name == thisPackage).ToList().FirstOrDefault();
 
         string actualVersion = meItem != null ? meItem.Version : string.Empty;
-        bool isTopLevel = topDependencies.Where(x => x.Name == target).Any();
+        bool isTopLevel = topDependencies.Where(x => x.Name == thisPackage).Any();
 
-        sb.AppendLine(formatter.MakeLine(target, version, actualVersion, tabCount, isTopLevel));
+        sb.AppendLine(formatter.MakeLine(parentPackage, meItem.Name, version, actualVersion, tabCount, isTopLevel));
 
-        var flist = packages.Where(x => x.HasDependencyWithName(target)).ToList();
+        var flist = packages.Where(x => x.HasDependencyWithName(thisPackage)).ToList();
         foreach (var p in flist)
         {
-            string childVersion = p.Dependencies.Where(x => x.Name == target).FirstOrDefault()?.Version ?? string.Empty;
-            sb.Append(ParentsStringText(p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, formatter));
+            string childVersion = p.Dependencies.Where(x => x.Name == thisPackage).FirstOrDefault()?.Version ?? string.Empty;
+            sb.Append(ParentsStringText(thisPackage, p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, formatter));
         }
 
         string header = string.Empty;
