@@ -17,7 +17,7 @@ namespace parse.project.assets.Formatters
         private Dictionary<string, string> symbolLookup;
         private int currentIndex;
 
-        private string GetMermaidSymbol(string packageName, string version= "")
+        private string GetMermaidSymbol(string packageName, bool isTopLevel, string version= "")
         {
             if (symbolLookup.ContainsKey(packageName))
             {
@@ -26,14 +26,18 @@ namespace parse.project.assets.Formatters
             currentIndex++;
             string symbol = $"K{currentIndex}";
             symbolLookup.Add(packageName, symbol);
+            string packageNameDisplay = isTopLevel ? $"**{packageName}**" : packageName;
+            string boxOpen = isTopLevel ? "{{" : "(";
+            string boxClose = isTopLevel ? "}}" : ")";
             if (string.IsNullOrEmpty(version))
             {
-                return $"{symbol}({packageName})";
+                return $"{symbol}{boxOpen}{packageNameDisplay}{boxClose}";
             }
-            return $"{symbol}(\"`{packageName}\r\n{version}`\")";
+            return $"{symbol}{boxOpen}\"`{packageNameDisplay}\r\n{version}`\"{boxClose}";
         }
 
-        
+
+
         public string MakeFooter()
         {
             return string.Empty;
@@ -55,9 +59,9 @@ namespace parse.project.assets.Formatters
         {
             if (string.IsNullOrWhiteSpace(parentPackage))
             {
-                return GetMermaidSymbol(packageName, actualVersion);
+                return GetMermaidSymbol(packageName, isTopLevel, actualVersion);
             }
-            return $"{GetMermaidSymbol(parentPackage)} --> |{version}| {GetMermaidSymbol(packageName, actualVersion)}"; 
+            return $"{GetMermaidSymbol(parentPackage, isTopLevel)} --> |\"`{version}`\"| {GetMermaidSymbol(packageName, isTopLevel, actualVersion)}"; 
         }
     }
 }
