@@ -123,7 +123,7 @@ internal class Program
         string actualVersion = meItem != null ? meItem.Version : string.Empty;
         bool isTopLevel = topDependencies.Where(x => x.Name == thisPackage).Any();
 
-        sb.AppendLine(formatter.MakeLine(parentPackage, meItem.Name, version, actualVersion, tabCount, isTopLevel));
+        sb.Append(formatter.MakeLine(parentPackage, meItem.Name, version, actualVersion, tabCount, isTopLevel));
 
         var flist = packages.Where(x => x.HasDependencyWithName(thisPackage)).ToList();
         foreach (var p in flist)

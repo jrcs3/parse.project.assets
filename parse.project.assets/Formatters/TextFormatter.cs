@@ -29,7 +29,7 @@ namespace parse.project.assets.Formatters
             string tabs = tabCount == 0 ? string.Empty : new string(' ', tabCount * 2);
             string topLevelX = isTopLevel ? " X" : string.Empty;
             string stringToAdd = $"{tabs}{packageName}".PadRight(60);
-            string stringToAddWIthVersions = $"{stringToAdd}\t{topLevelX}\t{actualVersion}\t{version}";
+            string stringToAddWIthVersions = $"{stringToAdd}\t{topLevelX}\t{actualVersion}\t{version}\r\n";
             return stringToAddWIthVersions;
         }
         public string MakeFooter()

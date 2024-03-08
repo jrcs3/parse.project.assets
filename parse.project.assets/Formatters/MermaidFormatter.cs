@@ -1,34 +1,29 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace parse.project.assets.Formatters
+﻿namespace parse.project.assets.Formatters
 {
     internal class MermaidFormatter : IOutputFormatter
     {
         public MermaidFormatter()
         {
-            symbolLookup = new Dictionary<string, string>();
-            currentIndex = 0;
+            _symbolLookup = new Dictionary<string, string>();
+            _currentIndex = 0;
+            _duplicatesList = new List<string>();
         }
-        private Dictionary<string, string> symbolLookup;
-        private int currentIndex;
+        private Dictionary<string, string> _symbolLookup;
+        private int _currentIndex;
+        private List<string> _duplicatesList;
 
         private string GetMermaidSymbol(string packageName, bool isTopLevel, string version= "")
         {
-            if (symbolLookup.ContainsKey(packageName))
+            if (_symbolLookup.ContainsKey(packageName))
             {
-                return symbolLookup[packageName];
+                return $"{_symbolLookup[packageName]}";
             }
-            currentIndex++;
-            string symbol = $"K{currentIndex}";
-            symbolLookup.Add(packageName, symbol);
+            _currentIndex++;
+            string symbol = $"MNode{_currentIndex}";
+            _symbolLookup.Add(packageName, symbol);
             string packageNameDisplay = isTopLevel ? $"**{packageName}**" : packageName;
             string boxOpen = isTopLevel ? "{{" : "(";
-            string boxClose = isTopLevel ? "}}" : ")";
+            string boxClose = isTopLevel ? "}}:::TopLevel" : ")";
             if (string.IsNullOrEmpty(version))
             {
                 return $"{symbol}{boxOpen}{packageNameDisplay}{boxClose}";
@@ -36,7 +31,24 @@ namespace parse.project.assets.Formatters
             return $"{symbol}{boxOpen}\"`{packageNameDisplay}\r\n{version}`\"{boxClose}";
         }
 
+        private string FormatDuplicatesListData(string parentPackage, string thisPackage, string actualVersion)
+        {
+            return $"{parentPackage}--{thisPackage}--{actualVersion}";
+        }
 
+        private bool IsDuplicate(string parentPackage, string thisPackage, string actualVersion)
+        {
+            return _duplicatesList.Contains(FormatDuplicatesListData(parentPackage, thisPackage, actualVersion));
+        }
+
+        private void AddToDuplicateList(string parentPackage, string thisPackage, string actualVersion)
+        {
+            string line = FormatDuplicatesListData(parentPackage, thisPackage, actualVersion);
+            if (!_duplicatesList.Contains(line))
+            {
+                _duplicatesList.Add(line);
+            }
+        }
 
         public string MakeFooter()
         {
@@ -45,23 +57,27 @@ namespace parse.project.assets.Formatters
 
         public string MakeHead()
         {
-            return "flowchart LR\r\n";
+            return "flowchart LR\r\n  classDef TopLevel fill: gold\r\n  classDef BottomLevel fill: silver\r\n";
         }
 
         public string MakeJobDescription(string packageName, string fileName, string dotNetVersion, int levels)
         {
-            //if (string.IsNullOrEmpty)
-            //throw new NotImplementedException();
             return string.Empty;
         }
 
         public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel)
         {
+            if (IsDuplicate(parentPackage, packageName, actualVersion))
+            {
+                return string.Empty;
+            }
+            AddToDuplicateList(parentPackage, packageName, actualVersion);
             if (string.IsNullOrWhiteSpace(parentPackage))
             {
-                return GetMermaidSymbol(packageName, isTopLevel, actualVersion);
+                string className = (tabCount == 0 && !isTopLevel) ? ":::BottomLevel" : string.Empty;
+                return $"  {GetMermaidSymbol(packageName, isTopLevel, actualVersion)}{className}\r\n";
             }
-            return $"{GetMermaidSymbol(parentPackage, isTopLevel)} --> |\"`{version}`\"| {GetMermaidSymbol(packageName, isTopLevel, actualVersion)}"; 
+            return $"  {GetMermaidSymbol(parentPackage, isTopLevel)} --> |\"`{version}`\"| {GetMermaidSymbol(packageName, isTopLevel, actualVersion)}\r\n"; 
         }
     }
 }

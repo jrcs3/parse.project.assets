@@ -12,6 +12,6 @@ public class Options
     public string? Version { get; set; }
     [Option('l', "levels", Required = false, HelpText = "Levels Deep to graph")]
     public int? Levels { get; set; }
-    [Option('r', "Format", Required = false, HelpText = "Format of the output (Text or CSV)")]
+    [Option('r', "Format", Required = false, HelpText = "Format of the output (text, csv or mermaid)")]
     public FormatOptions Format { get; set; } = FormatOptions.text;
 }
