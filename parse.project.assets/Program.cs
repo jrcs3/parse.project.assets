@@ -92,7 +92,7 @@ internal class Program
     }
 
     /// <remarks>
-    /// I'm working from the bottom to the top, If 
+    /// I'm working from the bottom to the top.
     /// </remarks>
     private static string ParentsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
     {

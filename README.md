@@ -64,9 +64,9 @@ C:\FilesToParse>
 
 Right now I'm just copying the output of the [Mermaid Live Editor](https://mermaid.live/). When I use that to render the above Mermaid code I get this:
 
-![Left to Right graph of System.Security.Principal.Windows](/parse.project.assets/assets/images/System.Security.Principal.Windows.png)
+![Left to Right graph of System.Security.Principal.Windows](/assets/images/System.Security.Principal.Windows.png)
 
 ### Newtonsoft.Json
 Sometimes the graph can get more complex. For example Newtonsoft.Json.
 
-![Left to Right graph of Newtonsoft.Json](/parse.project.assets/assets/images/Newtonsoft.Json.png)
+![Left to Right graph of Newtonsoft.Json](/assets/images/Newtonsoft.Json.png)
