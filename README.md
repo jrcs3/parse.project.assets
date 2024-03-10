@@ -42,4 +42,30 @@ C:\FilesToParse>
 
 ## Mermaid
 
-https://mermaid.live/
+```shell
+C:\FilesToParse>parse.project.assets -p System.Security.Principal.windows -r mermaid
+flowchart LR
+  classDef TopLevel fill: gold
+  classDef BottomLevel fill: silver
+  MNode1("`System.Security.Principal.Windows
+4.7.0`"):::BottomLevel
+  MNode1 --> |"`4.7.0`"| MNode2("`Microsoft.Win32.Registry
+4.7.0`")
+  MNode2 --> |"`4.7.0`"| MNode3{{"`**System.Data.SqlClient**
+4.8.5`"}}:::TopLevel
+  MNode1 --> |"`4.7.0`"| MNode3
+  MNode1 --> |"`4.7.0`"| MNode4("`System.Security.AccessControl
+4.7.0`")
+  MNode4 --> |"`4.7.0`"| MNode2
+
+C:\FilesToParse>
+```
+
+Right now I'm just copying the output of the [Mermaid Live Editor](https://mermaid.live/). When I use that to render the above Mermaid code I get this:
+
+![Left to Right graph of System.Security.Principal.Windows](/assets/images/System.Security.Principal.Windows.png)
+
+### Newtonsoft.Json
+Sometimes the graph can get more complex. For example Newtonsoft.Json.
+
+![Left to Right graph of Newtonsoft.Json](/assets/images/Newtonsoft.Json.png)
