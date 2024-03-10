@@ -32,9 +32,5 @@ namespace parse.project.assets.Formatters
             string stringToAddWIthVersions = $"{stringToAdd}\t{topLevelX}\t{actualVersion}\t{version}\r\n";
             return stringToAddWIthVersions;
         }
-        public string MakeFooter()
-        {
-            return string.Empty;
-        }
     }
 }

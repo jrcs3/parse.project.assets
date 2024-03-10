@@ -18,9 +18,5 @@
             string stringToAdd = $"{tabCount},\"{packageName}\",{topLevelX},\"{actualVersion}\",\"{version}\"\r\n";
             return stringToAdd;
         }
-        public string MakeFooter()
-        {
-            return string.Empty;
-        }
     }
 }

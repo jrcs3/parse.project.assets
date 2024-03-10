@@ -42,6 +42,7 @@ C:\FilesToParse>
 
 ## Mermaid
 
+
 ```shell
 C:\FilesToParse>parse.project.assets -p System.Security.Principal.windows -r mermaid
 flowchart LR

@@ -31,6 +31,7 @@
             return $"{symbol}{boxOpen}\"`{packageNameDisplay}\r\n{version}`\"{boxClose}";
         }
 
+        #region Prevent duplicate connections
         private string FormatDuplicatesListData(string parentPackage, string thisPackage, string actualVersion)
         {
             return $"{parentPackage}--{thisPackage}--{actualVersion}";
@@ -49,8 +50,9 @@
                 _duplicatesList.Add(line);
             }
         }
+        #endregion Prevent duplicate connections
 
-        public string MakeFooter()
+        public string MakeJobDescription(string packageName, string fileName, string dotNetVersion, int levels)
         {
             return string.Empty;
         }
@@ -58,11 +60,6 @@
         public string MakeHead()
         {
             return "flowchart LR\r\n  classDef TopLevel fill: gold\r\n  classDef BottomLevel fill: silver\r\n";
-        }
-
-        public string MakeJobDescription(string packageName, string fileName, string dotNetVersion, int levels)
-        {
-            return string.Empty;
         }
 
         public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel)
