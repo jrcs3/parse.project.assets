@@ -18,6 +18,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{EF29FB
 		assets\images\System.Security.Principal.Windows.png = assets\images\System.Security.Principal.Windows.png
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FilesToParse", "FilesToParse", "{48B69D07-D88E-484A-ABE5-F42159828480}"
+	ProjectSection(SolutionItems) = preProject
+		assets\FilesToParse\project.assets.json = assets\FilesToParse\project.assets.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +40,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{16F105FF-54D4-4AD2-BE12-2167D1705421} = {00CDD380-4AD3-4968-AFDA-BD79D839B810}
 		{EF29FBA9-9653-45C9-B5AA-23C5ED3774AE} = {16F105FF-54D4-4AD2-BE12-2167D1705421}
+		{48B69D07-D88E-484A-ABE5-F42159828480} = {16F105FF-54D4-4AD2-BE12-2167D1705421}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A64B2C83-7C3B-4BF1-847A-5C32DFB766F1}
