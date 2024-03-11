@@ -27,7 +27,7 @@ package is requested by each caller (this information is present without the swi
 C:\FilesToParse>parse.project.assets -f project.assets.json -p System.Security.Principal.windows
 
 Package      : System.Security.Principal.Windows
-File         : C:\Users\ajacs\source\repos\parse.project.assets\parse.project.assets\FilesToParse\project.assets.json
+File         : C:\FilesToParse\project.assets.json
 .NET version : net6.0
 Levels       : 1
 
