@@ -1,8 +1,8 @@
 ﻿using CommandLine;
 
-namespace parse.project.assets;
+namespace parse.project.assets.Options;
 
-public class Options
+public class ComandOptions
 {
     [Option('p', "package", Required = true, HelpText = "The NuGet package to scan for")]
     public string PackageName { get; set; } = string.Empty;

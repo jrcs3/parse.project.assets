@@ -1,6 +1,7 @@
-﻿using CommandLine;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using parse.project.assets.Formatters;
+using parse.project.assets.Options;
+using parse.project.assets.Parse;
 using System.Text;
 
 namespace parse.project.assets;
@@ -9,65 +10,41 @@ internal class Program
 {
     private static int Main(string[] args)
     {
-        // Potential command line switches
-        string packageName = string.Empty;
-        string fileName = string.Empty;
-        string dotNetVersion = "net6.0";
-        int levels = int.MaxValue;
-        FormatOptions format = FormatOptions.text;
+        RunOptions runOptions = CommandParser.GetRunOptions(args);
 
-        // Resolve the switches with Command Line Parser
-        Parser.Default.ParseArguments<Options>(args)
-             .WithParsed(o =>
-             {
-                 packageName = o.PackageName;
-                 fileName = GetFileName(o);
+        Console.Write(runOptions.Formatter.MakeJobDescription(runOptions.PackageName, runOptions.FileName, runOptions.DotNetVersion, runOptions.Levels));
 
-                 if (!string.IsNullOrWhiteSpace(o.Version))
-                 {
-                     dotNetVersion = o.Version;
-                 }
-                 if (o.Levels.HasValue)
-                 {
-                     levels = o.Levels.Value;
-                 }
-                 format = o.Format;
-             });
-
-        IOutputFormatter formatter = GetFormatter(format);
-
-        Console.Write(formatter.MakeJobDescription(packageName, fileName, dotNetVersion, levels));
-
-        if (!File.Exists(fileName))
+        if (!File.Exists(runOptions.FileName))
         {
-            Console.WriteLine($"Didn't find the file {fileName}");
+            Console.WriteLine($"Didn't find the file {runOptions.FileName}");
             return 1;
         }
 
-        JObject jsonContent = ReadFileIntoJObject(fileName);
+        JObject jsonContent = ReadFileIntoJObject(runOptions.FileName);
 
-        if (!DotNetVersionSupported(dotNetVersion, jsonContent))
+        if (!DotNetVersionSupported(runOptions.DotNetVersion, jsonContent))
         {
-            Console.WriteLine($"Didn't find support for the .NET version {dotNetVersion}");
+            Console.WriteLine($"Didn't find support for the .NET version {runOptions.DotNetVersion}");
             return 1;
         }
 
-        List<Dependency> topDependencies = GetTopDependencies(jsonContent, dotNetVersion);
-        List<Package> packages = GetPackages(jsonContent, dotNetVersion);
+        List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, runOptions.DotNetVersion);
+        List<Package> packages = PackageParser.GetPackages(jsonContent, runOptions.DotNetVersion);
 
-        packageName = CorrectTarget(packageName, packages);
+        runOptions.PackageName = CorrectTarget(runOptions.PackageName, packages);
 
-        string output = ParentsStringText(string.Empty, packageName, packages, topDependencies, string.Empty, 0, levels, formatter);
+        string output = ParentsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);
+        //string output = ChildsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);
 
         if (string.IsNullOrWhiteSpace(output))
         {
-            Console.WriteLine($"Nothing found for {packageName}");
+            Console.WriteLine($"Nothing found for {runOptions.PackageName}");
             return 1;
         }
 
-        if (levels < 1)
+        if (runOptions.Levels < 1)
         {
-            Console.WriteLine($"Invalid Levels, {levels} doesn't make sense.");
+            Console.WriteLine($"Invalid Levels, {runOptions.Levels} doesn't make sense.");
             return 1;
         }
 
@@ -76,19 +53,43 @@ internal class Program
         return 0;
     }
 
-    private static IOutputFormatter GetFormatter(FormatOptions format)
+    // Experiment: go top to bottom. May need to limit size somehow.
+    private static string ChildsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
     {
-        switch (format)
+        if (tabCount > levels)
         {
-            case FormatOptions.text:
-                return new TextFormatter();
-            case FormatOptions.csv:
-                return new CsvFormatter();
-            case FormatOptions.mermaid:
-                return new MermaidFormatter();
-            default:
-                throw new Exception($"invalid format {format}");
+            return string.Empty;
         }
+        StringBuilder sb = new();
+
+
+        Package? meItem = packages.Where(x => x.Name == thisPackage).ToList().FirstOrDefault();
+        if (meItem != null)
+        {
+            string thisPackageName = meItem?.Name ?? string.Empty;
+            string actualVersion = meItem != null ? meItem.Version : string.Empty;
+            sb.Append(formatter.MakeLine(parentPackage, thisPackageName, version, actualVersion, tabCount, false));
+            if (meItem != null)
+            {
+                var children = meItem.Dependencies;
+
+                if (children != null)
+                {
+                    foreach (var child in children)
+                    {
+                        sb.Append(ChildsStringText(thisPackage, child.Name, packages, topDependencies, child.Version, tabCount + 1, levels, formatter));
+                    }
+                }
+            }
+        }
+
+        string header = string.Empty;
+        if (tabCount == 0 && sb.Length > 0)
+        {
+            header = formatter.MakeHead();
+        }
+
+        return header + sb.ToString();
     }
 
     /// <remarks>
@@ -126,41 +127,6 @@ internal class Program
         return header + sb.ToString();
     }
 
-    /// <remarks>
-    /// I'm trying to be too fancy here. I may be making too many assumptions.
-    /// </remarks>
-    private static string GetFileName(Options o)
-    {
-        string fileName = string.Empty;
-        // -If there is no filename, should be `.\project.assets.json`
-        if (string.IsNullOrWhiteSpace(o.ProjectAssetsJsonFile))
-        {
-            string path = Directory.GetCurrentDirectory();
-            string tempFileName = Path.Combine(path, "project.assets.json");
-            if (File.Exists(tempFileName))
-            {
-                fileName = tempFileName;
-            }
-        }
-        // - If Path.GetDirectoryName() doesn't find a directory and it ends with .json". Assume that it is a file in the current directory
-        else if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(o.ProjectAssetsJsonFile)) 
-            && Path.GetExtension(o.ProjectAssetsJsonFile).ToLower() == ".json")
-        {
-            string path = Directory.GetCurrentDirectory();
-            fileName = Path.Combine(path, o.ProjectAssetsJsonFile);
-        }
-        // - If it doesn't end with ".json". Assume that this is a directory and the file name is "project.assets.json"
-        else if (Path.GetExtension(o.ProjectAssetsJsonFile).ToLower() != ".json")
-        {
-            fileName = Path.Combine(o.ProjectAssetsJsonFile, "project.assets.json");
-        }
-        // - Otherwise assume that we have the full directory.
-        else
-        {
-            fileName = o.ProjectAssetsJsonFile;
-        }
-        return fileName;
-    }
 
     /// <remarks>
     /// Since the tool I'm using to get NuGet packages of interst gives them in all lower case, but 
@@ -197,72 +163,4 @@ internal class Program
         return jsonContent;
     }
 
-    /// <remarks>
-    /// projectFileDependencyGroups contains the Top Level Dependencies for each suppored framework
-    /// </remarks>
-    private static List<Dependency> GetTopDependencies(JObject parsed, string dotNetVersion)
-    {
-        var dIdList = parsed["projectFileDependencyGroups"][dotNetVersion]
-            .ToList();
-
-        List<Dependency> topDependencies = new();
-
-        foreach (JToken? d in dIdList)
-        {
-            string fullName = d.ToString();
-
-            string[] parts = fullName.Split(">=");
-
-            if (parts.Length > 1)
-            {
-                string name = parts[0].Trim();
-                string version = parts[1].Trim();
-                topDependencies.Add(new Dependency(name, version));
-            }
-        }
-        return topDependencies;
-    }
-
-    /// <remarks>
-    /// targets contains the Top Level Dependencies for each suppored framework
-    /// </remarks>
-    private static List<Package> GetPackages(JObject parsed, string dotNetVersion)
-    {
-        List<JProperty> dIdList = parsed["targets"][dotNetVersion]
-            .Select(x => (JProperty)x)
-            .ToList();
-
-        List<Package> packages = new();
-
-        foreach (var d in dIdList)
-        {
-            string fullName = d.Name;
-            if (!string.IsNullOrEmpty(fullName))
-            {
-                string[] parts = fullName.Split('/');
-                if (parts.Length > 1)
-                {
-                    string name = parts[0];
-                    string version = parts[1];
-
-                    var pack = new Package(name, version);
-
-                    var dependency = d.Select(x => x.Value<JObject>("dependencies")).FirstOrDefault();
-
-                    if (dependency != null)
-                    {
-                        foreach (var ddws in dependency.Properties())
-                        {
-                            var dname = ddws.Name;
-                            var dversion = ddws.Value.ToString();
-
-                            pack.Dependencies.Add(new Dependency(dname, dversion));
-                        }
-                    }
-                    packages.Add(pack);
-                }
-            }
-        }
-        return packages;
-    }
 }

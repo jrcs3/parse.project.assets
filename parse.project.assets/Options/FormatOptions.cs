@@ -1,4 +1,4 @@
-﻿namespace parse.project.assets;
+﻿namespace parse.project.assets.Options;
 
 public enum FormatOptions
 {
