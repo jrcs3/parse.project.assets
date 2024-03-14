@@ -15,7 +15,7 @@ internal class PackageParser
 
         List<Package> packages = new();
 
-        foreach (var d in dIdList)
+        foreach (JProperty d in dIdList)
         {
             string fullName = d.Name;
             if (!string.IsNullOrEmpty(fullName))
@@ -26,16 +26,16 @@ internal class PackageParser
                     string name = parts[0];
                     string version = parts[1];
 
-                    var pack = new Package(name, version);
+                    Package pack = new Package(name, version);
 
-                    var dependency = d.Select(x => x.Value<JObject>("dependencies")).FirstOrDefault();
+                    JObject? dependency = d.Select(x => x.Value<JObject>("dependencies")).FirstOrDefault();
 
                     if (dependency != null)
                     {
-                        foreach (var ddws in dependency.Properties())
+                        foreach (JProperty? ddws in dependency.Properties())
                         {
-                            var dname = ddws.Name;
-                            var dversion = ddws.Value.ToString();
+                            string dname = ddws.Name;
+                            string dversion = ddws.Value.ToString();
 
                             pack.Dependencies.Add(new Dependency(dname, dversion));
                         }

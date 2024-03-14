@@ -71,11 +71,11 @@ internal class Program
             sb.Append(formatter.MakeLine(parentPackage, thisPackageName, version, actualVersion, tabCount, false));
             if (meItem != null)
             {
-                var children = meItem.Dependencies;
+                List<Dependency> children = meItem.Dependencies;
 
                 if (children != null)
                 {
-                    foreach (var child in children)
+                    foreach (Dependency child in children)
                     {
                         sb.Append(ChildsStringText(thisPackage, child.Name, packages, topDependencies, child.Version, tabCount + 1, levels, formatter));
                     }
@@ -111,8 +111,8 @@ internal class Program
 
         sb.Append(formatter.MakeLine(parentPackage, thisPackageName, version, actualVersion, tabCount, isTopLevel));
 
-        var flist = packages.Where(x => x.HasDependencyWithName(thisPackage)).ToList();
-        foreach (var p in flist)
+        List<Package> flist = packages.Where(x => x.HasDependencyWithName(thisPackage)).ToList();
+        foreach (Package p in flist)
         {
             string childVersion = p.Dependencies.Where(x => x.Name == thisPackage).FirstOrDefault()?.Version ?? string.Empty;
             sb.Append(ParentsStringText(thisPackage, p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, formatter));
@@ -159,7 +159,7 @@ internal class Program
             textContent = r.ReadToEnd();
         }
 
-        var jsonContent = JObject.Parse(textContent);
+        JObject jsonContent = JObject.Parse(textContent);
         return jsonContent;
     }
 

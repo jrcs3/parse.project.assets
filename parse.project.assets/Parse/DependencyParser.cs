@@ -9,7 +9,7 @@ internal class DependencyParser
     /// </remarks>
     public static List<Dependency> GetTopDependencies(JObject parsed, string dotNetVersion)
     {
-        var dIdList = parsed["projectFileDependencyGroups"][dotNetVersion]
+        List<JToken> dIdList = parsed["projectFileDependencyGroups"][dotNetVersion]
             .ToList();
 
         List<Dependency> topDependencies = new();
