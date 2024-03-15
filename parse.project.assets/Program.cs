@@ -33,7 +33,7 @@ internal class Program
 
         runOptions.PackageName = CorrectTarget(runOptions.PackageName, packages);
 
-        string output = ParentsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);
+        string output = OutputWritter.ParentsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);
         //string output = ChildsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);
 
         if (string.IsNullOrWhiteSpace(output))
@@ -52,81 +52,6 @@ internal class Program
 
         return 0;
     }
-
-    // Experiment: go top to bottom. May need to limit size somehow.
-    private static string ChildsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
-    {
-        if (tabCount > levels)
-        {
-            return string.Empty;
-        }
-        StringBuilder sb = new();
-
-
-        Package? meItem = packages.Where(x => x.Name == thisPackage).ToList().FirstOrDefault();
-        if (meItem != null)
-        {
-            string thisPackageName = meItem?.Name ?? string.Empty;
-            string actualVersion = meItem != null ? meItem.Version : string.Empty;
-            sb.Append(formatter.MakeLine(parentPackage, thisPackageName, version, actualVersion, tabCount, false));
-            if (meItem != null)
-            {
-                List<Dependency> children = meItem.Dependencies;
-
-                if (children != null)
-                {
-                    foreach (Dependency child in children)
-                    {
-                        sb.Append(ChildsStringText(thisPackage, child.Name, packages, topDependencies, child.Version, tabCount + 1, levels, formatter));
-                    }
-                }
-            }
-        }
-
-        string header = string.Empty;
-        if (tabCount == 0 && sb.Length > 0)
-        {
-            header = formatter.MakeHead();
-        }
-
-        return header + sb.ToString();
-    }
-
-    /// <remarks>
-    /// I'm working from the bottom to the top.
-    /// </remarks>
-    private static string ParentsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
-    {
-        if (tabCount > levels)
-        {
-            return string.Empty;
-        }
-        StringBuilder sb = new();
-
-        Package? meItem = packages.Where(x => x.Name == thisPackage).ToList().FirstOrDefault();
-
-        string actualVersion = meItem != null ? meItem.Version : string.Empty;
-        bool isTopLevel = topDependencies.Where(x => x.Name == thisPackage).Any();
-        string thisPackageName = meItem ?.Name ?? string.Empty;
-
-        sb.Append(formatter.MakeLine(parentPackage, thisPackageName, version, actualVersion, tabCount, isTopLevel));
-
-        List<Package> flist = packages.Where(x => x.HasDependencyWithName(thisPackage)).ToList();
-        foreach (Package p in flist)
-        {
-            string childVersion = p.Dependencies.Where(x => x.Name == thisPackage).FirstOrDefault()?.Version ?? string.Empty;
-            sb.Append(ParentsStringText(thisPackage, p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, formatter));
-        }
-
-        string header = string.Empty;
-        if (tabCount == 0 && sb.Length > 0)
-        {
-            header = formatter.MakeHead();
-        }
-
-        return header + sb.ToString();
-    }
-
 
     /// <remarks>
     /// Since the tool I'm using to get NuGet packages of interst gives them in all lower case, but 

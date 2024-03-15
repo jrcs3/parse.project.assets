@@ -6,7 +6,7 @@ namespace parse.project.assets.Formatters
     {
         public string MakeJobDescription(string packageName, string fileName, string dotNetVersion, int levels)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine($"Package      : {packageName}");
             sb.AppendLine($"File         : {fileName}");
             sb.AppendLine($".NET version : {dotNetVersion}");

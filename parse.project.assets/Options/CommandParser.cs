@@ -7,48 +7,44 @@ internal class CommandParser
 {
     public static RunOptions GetRunOptions(string[] args)
     {
-        RunOptions runOptions = new RunOptions();
-        runOptions.PackageName = string.Empty;
-        runOptions.FileName = string.Empty;
-        runOptions.DotNetVersion = "net6.0";
-        runOptions.Levels = int.MaxValue;
-        runOptions.Format = FormatOptions.text;
+        string packageName = string.Empty;
+        string fileName = string.Empty;
+        string dotNetVersion = "net6.0";
+        int levels = int.MaxValue;
+        FormatOptions format = FormatOptions.text;
 
         // Resolve the switches with Command Line Parser
         Parser.Default.ParseArguments<ComandOptions>(args)
              .WithParsed(o =>
              {
-                 runOptions.PackageName = o.PackageName;
-                 runOptions.FileName = GetFileName(o);
+                 packageName = o.PackageName;
+                 fileName = GetFileName(o);
 
                  if (!string.IsNullOrWhiteSpace(o.Version))
                  {
-                     runOptions.DotNetVersion = o.Version;
+                     dotNetVersion = o.Version;
                  }
                  if (o.Levels.HasValue)
                  {
-                     runOptions.Levels = o.Levels.Value;
+                     levels = o.Levels.Value;
                  }
-                 runOptions.Format = o.Format;
+                 format = o.Format;
              });
 
-        runOptions.Formatter = GetFormatter(runOptions.Format);
+        IOutputFormatter formatter = GetFormatter(format);
+        var runOptions = new RunOptions(packageName, fileName, dotNetVersion, levels, format, formatter);
         return runOptions;
     }
 
     private static IOutputFormatter GetFormatter(FormatOptions format)
     {
-        switch (format)
+        return format switch
         {
-            case FormatOptions.text:
-                return new TextFormatter();
-            case FormatOptions.csv:
-                return new CsvFormatter();
-            case FormatOptions.mermaid:
-                return new MermaidFormatter();
-            default:
-                throw new Exception($"invalid format {format}");
-        }
+            FormatOptions.text => new TextFormatter(),
+            FormatOptions.csv => new CsvFormatter(),
+            FormatOptions.mermaid => new MermaidFormatter(),
+            _ => throw new Exception($"invalid format {format}"),
+        };
     }
 
     /// <remarks>

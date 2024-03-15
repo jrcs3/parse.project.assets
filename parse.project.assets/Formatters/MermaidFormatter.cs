@@ -8,9 +8,9 @@
             _currentIndex = 0;
             _duplicatesList = new List<string>();
         }
-        private Dictionary<string, string> _symbolLookup;
+        private readonly Dictionary<string, string> _symbolLookup;
         private int _currentIndex;
-        private List<string> _duplicatesList;
+        private readonly List<string> _duplicatesList;
 
         private string GetMermaidSymbol(string packageName, bool isTopLevel, string version= "")
         {
@@ -32,7 +32,7 @@
         }
 
         #region Prevent duplicate connections
-        private string FormatDuplicatesListData(string parentPackage, string thisPackage, string actualVersion)
+        private static string FormatDuplicatesListData(string parentPackage, string thisPackage, string actualVersion)
         {
             return $"{parentPackage}--{thisPackage}--{actualVersion}";
         }
