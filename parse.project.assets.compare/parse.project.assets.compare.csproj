@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,12 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\parse.project.assets.shared\parse.project.assets.shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="FilesToParse\project.assets.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

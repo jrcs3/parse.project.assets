@@ -1,6 +1,6 @@
-﻿namespace parse.project.assets.Parse;
+﻿namespace parse.project.assets.shared.Parse;
 
-internal class Package
+public class Package
 {
     public Package(string name, string version)
     {

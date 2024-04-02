@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace parse.project.assets.Parse;
+namespace parse.project.assets.shared.Parse;
 
-internal class PackageParser
+public class PackageParser
 {
     /// <remarks>
     /// targets contains the Top Level Dependencies for each suppored framework
@@ -26,7 +26,7 @@ internal class PackageParser
                     string name = parts[0];
                     string version = parts[1];
 
-                    Package pack = new Package(name, version);
+                    Package pack = new(name, version);
 
                     JObject? dependency = d.Select(x => x.Value<JObject>("dependencies")).FirstOrDefault();
 

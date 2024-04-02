@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace parse.project.assets.Parse;
+namespace parse.project.assets.shared.Parse;
 
-internal class DependencyParser
+public class DependencyParser
 {
     /// <remarks>
     /// projectFileDependencyGroups contains the Top Level Dependencies for each suppored framework
