@@ -2,7 +2,7 @@
 using parse.project.assets.Formatters;
 using parse.project.assets.Options;
 using parse.project.assets.shared.Parse;
-using System.Text;
+using parse.project.assets.shared.Read;
 
 namespace parse.project.assets;
 
@@ -20,9 +20,10 @@ internal class Program
             return 1;
         }
 
-        JObject jsonContent = ReadFileIntoJObject(runOptions.FileName);
+        FileReader fileReader = new();
+        JObject jsonContent = fileReader.ReadFileIntoJObject(runOptions.FileName);
 
-        if (!DotNetVersionSupported(runOptions.DotNetVersion, jsonContent))
+        if (!fileReader.DotNetVersionSupported(runOptions.DotNetVersion, jsonContent))
         {
             Console.WriteLine($"Didn't find support for the .NET version {runOptions.DotNetVersion}");
             return 1;
@@ -31,7 +32,7 @@ internal class Program
         List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, runOptions.DotNetVersion);
         List<Package> packages = PackageParser.GetPackages(jsonContent, runOptions.DotNetVersion);
 
-        runOptions.PackageName = CorrectTarget(runOptions.PackageName, packages);
+        runOptions.PackageName = fileReader.CorrectTarget(runOptions.PackageName, packages);
 
         string output = OutputWritter.ParentsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);
         //string output = ChildsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);
@@ -52,40 +53,4 @@ internal class Program
 
         return 0;
     }
-
-    /// <remarks>
-    /// Since the tool I'm using to get NuGet packages of interst gives them in all lower case, but 
-    /// project.assets.json (and NuGet for that matter) gives package names mixed cases I wanted to 
-    /// support prividing package names in any case the user give it in.
-    /// Also, it is easier to deal with casing in one place.
-    /// </remarks>
-    private static string CorrectTarget(string target, List<Package> packages)
-    {
-        string? correctedName = packages.Where(x => x.Name.Trim().ToLower() == target.Trim().ToLower()).FirstOrDefault()?.Name;
-        if (!string.IsNullOrWhiteSpace(correctedName))
-        {
-            target = correctedName;
-        }
-        return target;
-    }
-
-    private static bool DotNetVersionSupported(string dotNetVersion, JObject jsonContent)
-    {
-        bool projectFileDependencyGroups = ((JObject)jsonContent["projectFileDependencyGroups"]).ContainsKey(dotNetVersion);
-        bool targets = ((JObject)jsonContent["targets"]).ContainsKey(dotNetVersion);
-        return projectFileDependencyGroups && targets;
-    }
-
-    private static JObject ReadFileIntoJObject(string jsonStr)
-    {
-        string textContent;
-        using (StreamReader r = new(jsonStr))
-        {
-            textContent = r.ReadToEnd();
-        }
-
-        JObject jsonContent = JObject.Parse(textContent);
-        return jsonContent;
-    }
-
 }
