@@ -1,13 +1,12 @@
-﻿namespace parse.project.assets.compare
+﻿namespace parse.project.assets.compare;
+
+public class PackageVersion
 {
-    public class PackageVersion
+    public PackageVersion(string versionNumber)
     {
-        public PackageVersion(string versionNumber)
-        {
-            VersionNumber = versionNumber;
-            UsingProject = new List<string>();
-        }
-        public string VersionNumber { get; set; }          
-        public List<string> UsingProject { get; set;}
+        VersionNumber = versionNumber;
+        UsingProject = new List<PackageUser>();
     }
+    public string VersionNumber { get; set; }          
+    public List<PackageUser> UsingProject { get; set;}
 }

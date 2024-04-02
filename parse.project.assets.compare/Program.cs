@@ -19,6 +19,9 @@ Console.WriteLine("  Loading");
 Console.WriteLine(new string('-', 80));
 Console.WriteLine();
 
+Console.WriteLine("Proj\tVer\tNuGet");
+Console.WriteLine("====\t===\t=====");
+
 
 foreach (string file in files)
 {
@@ -29,22 +32,24 @@ foreach (string file in files)
     List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
     List<Package> packages = PackageParser.GetPackages(jsonContent, dotNetVersion);
 
-    foreach (Dependency dependency in topDependencies)
+    foreach (Package package in packages)
     {
-        Console.WriteLine($"\t{dependency.Name} => {dependency.Version}");
-        PackageDescription? packageDescription = packageDescriptions.Where(pd => pd.PackageName == dependency.Name).FirstOrDefault();
+        Console.WriteLine($"\t{package.Version}\t{package.Name}");
+        PackageDescription? packageDescription = packageDescriptions.Where(pd => pd.PackageName == package.Name).FirstOrDefault();
         if (packageDescription == null)
         {
-            packageDescription =  new PackageDescription(dependency.Name);
+            packageDescription =  new PackageDescription(package.Name);
             packageDescriptions.Add(packageDescription);
         }
-        PackageVersion? packageVersion = packageDescription.PackageVersions.Where(packageVersion => packageVersion.VersionNumber == dependency.Version).FirstOrDefault();
+        PackageVersion? packageVersion = packageDescription.PackageVersions.Where(packageVersion => packageVersion.VersionNumber == package.Version).FirstOrDefault();
         if (packageVersion == null)
         {
-            packageVersion = new PackageVersion(dependency.Version);
+            packageVersion = new PackageVersion(package.Version);
             packageDescription.PackageVersions.Add(packageVersion);
         }
-        packageVersion.UsingProject.Add(projectName);
+        bool isTopLevel = topDependencies.Where(p => p.Name == package.Name).Any();
+        PackageUser user = new PackageUser(projectName, isTopLevel);
+        packageVersion.UsingProject.Add(user);
     }
 }
 
@@ -53,6 +58,8 @@ Console.WriteLine(new string('-', 80));
 Console.WriteLine("  Filter Results");
 Console.WriteLine(new string('-', 80));
 Console.WriteLine();
+Console.WriteLine("NuGet\tVer\tTop?\tProj");
+Console.WriteLine("=====\t===\t====\t====");
 
 var itemList = packageDescriptions.Where(pd => pd.PackageVersions.Count > 1).ToList();
 
@@ -70,7 +77,8 @@ else
             Console.WriteLine($"\t{packageVersion.VersionNumber}");
             foreach (var customer in packageVersion.UsingProject)
             {
-                Console.WriteLine($"\t\t {customer}");
+                string isTopLevelString = customer.IsTopLevel ? " X" : " ";
+                Console.WriteLine($"\t\t{isTopLevelString}\t{customer.Name}");
             }
         }
     }
