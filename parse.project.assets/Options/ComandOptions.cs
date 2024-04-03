@@ -12,6 +12,8 @@ public class ComandOptions
     public string? Version { get; set; }
     [Option('l', "levels", Required = false, HelpText = "Levels Deep to graph")]
     public int? Levels { get; set; }
-    [Option('r', "Format", Required = false, HelpText = "Format of the output (text, csv or mermaid)")]
+    [Option('r', "format", Required = false, HelpText = "Format of the output (text, csv or mermaid)")]
     public FormatOptions Format { get; set; } = FormatOptions.text;
+    [Option('v', "vertical", Required = false, HelpText = "Display vertical (mermaid only)")]
+    public bool Vertical { get; set; } = false;
 }

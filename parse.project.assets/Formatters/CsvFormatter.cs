@@ -6,7 +6,7 @@
         {
             return string.Empty;
         }
-        public string MakeHead(string packageName)
+        public string MakeHead(string packageName, bool vertical)
         {
             return $"Level,Package Name,Top?,Version,Child\r\n";
         }

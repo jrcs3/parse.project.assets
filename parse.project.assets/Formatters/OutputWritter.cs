@@ -8,7 +8,7 @@ internal class OutputWritter
     /// <remarks>
     /// I'm working from the bottom to the top.
     /// </remarks>
-    public static string ParentsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
+    public static string ParentsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, bool vertical, IOutputFormatter formatter)
     {
         if (tabCount > levels)
         {
@@ -28,20 +28,20 @@ internal class OutputWritter
         foreach (Package p in flist)
         {
             string childVersion = p.Dependencies.Where(x => x.Name == thisPackage).FirstOrDefault()?.Version ?? string.Empty;
-            sb.Append(ParentsStringText(thisPackage, p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, formatter));
+            sb.Append(ParentsStringText(thisPackage, p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, vertical, formatter));
         }
 
         string header = string.Empty;
         if (tabCount == 0 && sb.Length > 0)
         {
-            header = formatter.MakeHead(thisPackage);
+            header = formatter.MakeHead(thisPackage, vertical);
         }
 
         return header + sb.ToString();
     }
 
     // Experiment: go top to bottom. May need to limit size somehow.
-    private static string ChildsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, IOutputFormatter formatter)
+    private static string ChildsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, bool vertical, IOutputFormatter formatter)
     {
         if (tabCount > levels)
         {
@@ -64,7 +64,7 @@ internal class OutputWritter
                 {
                     foreach (Dependency child in children)
                     {
-                        sb.Append(ChildsStringText(thisPackage, child.Name, packages, topDependencies, child.Version, tabCount + 1, levels, formatter));
+                        sb.Append(ChildsStringText(thisPackage, child.Name, packages, topDependencies, child.Version, tabCount + 1, levels, vertical, formatter));
                     }
                 }
             }
@@ -73,7 +73,7 @@ internal class OutputWritter
         string header = string.Empty;
         if (tabCount == 0 && sb.Length > 0)
         {
-            header = formatter.MakeHead(parentPackage);
+            header = formatter.MakeHead(parentPackage, vertical);
         }
 
         return header + sb.ToString();

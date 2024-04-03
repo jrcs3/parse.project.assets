@@ -19,7 +19,7 @@ namespace parse.project.assets.Formatters
             return superHeader;
         }
 
-        public string MakeHead(string packageName)
+        public string MakeHead(string packageName, bool vertical)
         {
             return $"{string.Empty,-60}\tTop?\tVersion\tChild\r\n{string.Empty,-60}\t====\t=======\t=====\r\n";
         }

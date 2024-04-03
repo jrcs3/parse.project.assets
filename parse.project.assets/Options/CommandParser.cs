@@ -11,6 +11,7 @@ internal class CommandParser
         string fileName = string.Empty;
         string dotNetVersion = "net6.0";
         int levels = int.MaxValue;
+        bool vertical = false;
         FormatOptions format = FormatOptions.text;
 
         // Resolve the switches with Command Line Parser
@@ -28,11 +29,12 @@ internal class CommandParser
                  {
                      levels = o.Levels.Value;
                  }
+                 vertical = o.Vertical;
                  format = o.Format;
              });
 
         IOutputFormatter formatter = GetFormatter(format);
-        var runOptions = new RunOptions(packageName, fileName, dotNetVersion, levels, format, formatter);
+        var runOptions = new RunOptions(packageName, fileName, dotNetVersion, levels, format, formatter, vertical);
         return runOptions;
     }
 

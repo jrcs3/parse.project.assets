@@ -57,9 +57,10 @@
             return string.Empty;
         }
 
-        public string MakeHead(string packageName)
+        public string MakeHead(string packageName, bool vertical)
         {
-            return $"---\r\ntitle: {packageName}\r\n---\r\nflowchart LR\r\n  classDef TopLevel fill: gold\r\n  classDef BottomLevel fill: silver\r\n";
+            string directionSymbol = vertical ? "TB" : "LR";
+            return $"---\r\ntitle: {packageName}\r\n---\r\nflowchart {directionSymbol}\r\n  classDef TopLevel fill: gold\r\n  classDef BottomLevel fill: silver\r\n";
         }
 
         public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel)
