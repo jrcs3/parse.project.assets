@@ -34,7 +34,7 @@ internal class OutputWritter
         string header = string.Empty;
         if (tabCount == 0 && sb.Length > 0)
         {
-            header = formatter.MakeHead();
+            header = formatter.MakeHead(thisPackage);
         }
 
         return header + sb.ToString();
@@ -73,7 +73,7 @@ internal class OutputWritter
         string header = string.Empty;
         if (tabCount == 0 && sb.Length > 0)
         {
-            header = formatter.MakeHead();
+            header = formatter.MakeHead(parentPackage);
         }
 
         return header + sb.ToString();
