@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using parse.project.assets.compare.Options;
-using parse.project.assets.compare.Packages;
+using parse.project.assets.compare.NuGetPackages;
 using parse.project.assets.shared.Parse;
 using parse.project.assets.shared.Read;
 
