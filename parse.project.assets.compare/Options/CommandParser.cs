@@ -7,7 +7,8 @@ internal class CommandParser
     public static RunOptions GetRunOptions(string[] args)
     {
         string rootDir = string.Empty;
-        string dotNetVersion = "net6.0";
+        //string dotNetVersion = "net6.0";
+        string dotNetVersion = string.Empty;
 
         // Resolve the switches with Command Line Parser
         Parser.Default.ParseArguments<ComandOptions>(args)

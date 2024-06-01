@@ -8,7 +8,7 @@ public class DependencyParser
     /// projectFileDependencyGroups contains the Top Level Dependencies for each suppored framework
     /// </remarks>
     public static List<Dependency> GetTopDependencies(JObject parsed, string dotNetVersion)
-    {
+    {        
         List<JToken> dIdList = parsed["projectFileDependencyGroups"][dotNetVersion]
             .ToList();
 

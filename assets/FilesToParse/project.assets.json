@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {
+    "net8.0": {
       "ADO.Net.Client/1.4.4": {
         "type": "package",
         "dependencies": {
@@ -683,7 +683,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net6.0": [
+    "net8.0": [
       "ADO.Net.Client >= 1.4.4",
       "CsvCommonLib >= 1.0.0",
       "System.Data.SqlClient >= 4.8.5"
@@ -711,7 +711,7 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net6.0"
+        "net8.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -720,8 +720,8 @@
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "projectReferences": {
             "C:\\Users\\ajacs\\source\\repos\\SyncFileToDb\\CsvCommonLib\\CsvCommonLib.csproj": {
               "projectPath": "C:\\Users\\ajacs\\source\\repos\\SyncFileToDb\\CsvCommonLib\\CsvCommonLib.csproj"
@@ -736,8 +736,8 @@
       }
     },
     "frameworks": {
-      "net6.0": {
-        "targetAlias": "net6.0",
+      "net8.0": {
+        "targetAlias": "net8.0",
         "dependencies": {
           "ADO.Net.Client": {
             "target": "Package",

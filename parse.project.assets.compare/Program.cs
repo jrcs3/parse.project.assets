@@ -3,6 +3,7 @@ using parse.project.assets.compare.Options;
 using parse.project.assets.compare.NuGetPackages;
 using parse.project.assets.shared.Parse;
 using parse.project.assets.shared.Read;
+using System.Net.Http.Json;
 
 namespace parse.project.assets.compare;
 internal class Program
@@ -27,15 +28,18 @@ internal class Program
         Console.WriteLine("Proj\tVer\tNuGet");
         Console.WriteLine("====\t===\t=====");
 
-
         foreach (string file in files)
         {
             //string projectName = Path.GetFileNameWithoutExtension(file.Replace("obj\\project.assets.json", ""));
             string projectName = GetProjectFromFileName(file);
             Console.WriteLine(projectName);
             JObject jsonContent = fileReader.ReadFileIntoJObject(file);
-            List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, runOptions.DotNetVersion);
-            List<Package> packages = PackageParser.GetPackages(jsonContent, runOptions.DotNetVersion);
+
+            string dotNetVersion = GetVersion(jsonContent, runOptions.DotNetVersion);
+            //dotNetVersion = GetVersion(jsonContent, dotNetVersion);
+
+            List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
+            List<Package> packages = PackageParser.GetPackages(jsonContent, dotNetVersion);
 
             foreach (Package package in packages)
             {
@@ -96,4 +100,17 @@ internal class Program
         int pos = backClipped.LastIndexOf('\\');
         return backClipped.Substring(pos + 1);
     }
+    private static string GetVersion(JObject parsed, string dotNetVersion)
+    {
+        if (string.IsNullOrWhiteSpace(dotNetVersion))
+        {
+            var items = parsed["projectFileDependencyGroups"];
+            if (items.Count() == 1)
+            {
+                dotNetVersion = ((JProperty)items.First).Name;
+            }
+        }
+        return dotNetVersion;
+    }
+
 }

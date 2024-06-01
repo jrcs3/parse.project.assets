@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using CommandLine;
+using Newtonsoft.Json.Linq;
 using parse.project.assets.Formatters;
 using parse.project.assets.Options;
 using parse.project.assets.shared.Parse;
@@ -29,8 +30,11 @@ internal class Program
             return 1;
         }
 
-        List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, runOptions.DotNetVersion);
-        List<Package> packages = PackageParser.GetPackages(jsonContent, runOptions.DotNetVersion);
+        string dotNetVersion = GetVersion(jsonContent, runOptions.DotNetVersion);
+        //dotNetVersion = GetVersion(jsonContent, dotNetVersion);
+
+        List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
+        List<Package> packages = PackageParser.GetPackages(jsonContent, dotNetVersion);
 
         runOptions.PackageName = fileReader.CorrectTarget(runOptions.PackageName, packages);
 
@@ -53,4 +57,18 @@ internal class Program
 
         return 0;
     }
+
+    private static string GetVersion(JObject parsed, string dotNetVersion)
+    {
+        if (string.IsNullOrWhiteSpace(dotNetVersion))
+        {
+            var items = parsed["projectFileDependencyGroups"];
+            if (items.Count() == 1)
+            {
+                dotNetVersion = ((JProperty)items.First).Name;
+            }
+        }
+        return dotNetVersion;
+    }
+
 }
