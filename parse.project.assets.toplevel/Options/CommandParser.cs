@@ -13,7 +13,7 @@ internal class CommandParser
     internal static RunOptions GetRunOptions(string[] args)
     {
         string fileName = string.Empty;
-        string dotNetVersion = "net6.0";
+        string dotNetVersion = string.Empty;
 
         Parser.Default.ParseArguments<ComandOptions>(args)
              .WithParsed(o =>

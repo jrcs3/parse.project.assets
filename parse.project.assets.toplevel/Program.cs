@@ -23,12 +23,14 @@ internal class Program
         FileReader fileReader = new();
         JObject jsonContent = fileReader.ReadFileIntoJObject(runOptions.FileName);
 
-        if (!fileReader.DotNetVersionSupported(runOptions.DotNetVersion, jsonContent))
+        string dotNetVersion = GetVersion(jsonContent, runOptions.DotNetVersion);
+
+
+        if (!fileReader.DotNetVersionSupported(dotNetVersion, jsonContent))
         {
             Console.WriteLine($"Didn't find support for the .NET version {runOptions.DotNetVersion}");
             return 1;
         }
-        string dotNetVersion = GetVersion(jsonContent, runOptions.DotNetVersion);
 
 
         List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
@@ -40,11 +42,11 @@ internal class Program
             List<Package> flist = packages.Where(x => x.HasDependencyWithName(dependency.Name)).ToList();
             foreach(var package in flist)
             {
-                Console.WriteLine($"\t{package.Name} {package.Version}");
+                Dependency deps = package.Dependencies.Where(x => x.Name == dependency.Name).First();
+                string verMatch = deps.Version == dependency.Version ? "<= MATCH!" : string.Empty;
+                Console.WriteLine($"\t{package.Name} - {package.Version} {verMatch}");
             }
         }
-
-
 
         return 0;
     }
