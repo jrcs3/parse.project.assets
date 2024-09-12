@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace parse.project.assets.toplevel.Options;
+﻿namespace parse.project.assets.toplevel.Options;
 
 internal class RunOptions
 {

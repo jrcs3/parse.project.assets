@@ -1,10 +1,4 @@
 ﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace parse.project.assets.toplevel.Options;
 
@@ -26,7 +20,7 @@ internal class CommandParser
                  }
              });
 
-        var runOptions = new RunOptions(fileName, dotNetVersion);
+        RunOptions runOptions = new RunOptions(fileName, dotNetVersion);
         return runOptions;
 
     }

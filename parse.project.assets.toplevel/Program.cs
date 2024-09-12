@@ -1,5 +1,4 @@
-﻿using CommandLine;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using parse.project.assets.shared.Parse;
 using parse.project.assets.shared.Read;
 using parse.project.assets.toplevel.Options;
@@ -25,26 +24,41 @@ internal class Program
 
         string dotNetVersion = GetVersion(jsonContent, runOptions.DotNetVersion);
 
-
         if (!fileReader.DotNetVersionSupported(dotNetVersion, jsonContent))
         {
             Console.WriteLine($"Didn't find support for the .NET version {runOptions.DotNetVersion}");
             return 1;
         }
 
-
         List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
         List<Package> packages = PackageParser.GetPackages(jsonContent, dotNetVersion);
-
-        foreach (var dependency in topDependencies)
+        Console.WriteLine("\r\nTop Level Packages:");
+        List<string> packagesOfInterest = new List<string>();
+        foreach (Dependency dependency in topDependencies)
         {
             Console.WriteLine($"{dependency.Name} - {dependency.Version}");
             List<Package> flist = packages.Where(x => x.HasDependencyWithName(dependency.Name)).ToList();
-            foreach(var package in flist)
+            foreach(Package package in flist)
             {
                 Dependency deps = package.Dependencies.Where(x => x.Name == dependency.Name).First();
                 string verMatch = deps.Version == dependency.Version ? "<= MATCH!" : string.Empty;
                 Console.WriteLine($"\t{package.Name} - {package.Version} {verMatch}");
+                if (deps.Version == dependency.Version)
+                {
+                    string packageNameAndVersion = $"{package.Name} - {package.Version}";
+                    if (!packagesOfInterest.Contains(packageNameAndVersion))
+                    {
+                        packagesOfInterest.Add(packageNameAndVersion);
+                    }
+                }
+            }
+        }
+        if (packagesOfInterest.Count > 0)
+        {
+            Console.WriteLine("\r\nPackages of Interest:");
+            foreach (string package in packagesOfInterest)
+            {
+                Console.WriteLine(package);
             }
         }
 
@@ -55,7 +69,7 @@ internal class Program
     {
         if (string.IsNullOrWhiteSpace(dotNetVersion))
         {
-            var items = parsed["projectFileDependencyGroups"];
+            JToken items = parsed["projectFileDependencyGroups"];
             if (items.Count() == 1)
             {
                 dotNetVersion = ((JProperty)items.First).Name;
