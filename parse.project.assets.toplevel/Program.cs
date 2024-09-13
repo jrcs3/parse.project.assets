@@ -2,6 +2,8 @@
 using parse.project.assets.shared.Parse;
 using parse.project.assets.shared.Read;
 using parse.project.assets.toplevel.Options;
+using System.Text;
+using parse.project.assets.shared.Options;
 
 namespace parse.project.assets.toplevel;
 
@@ -11,7 +13,7 @@ internal class Program
     {
         RunOptions runOptions = CommandParser.GetRunOptions(args);
 
-        Console.WriteLine($"{runOptions.FileName}, {runOptions.DotNetVersion}");
+        Console.WriteLine($"{runOptions.FileName} {runOptions.DotNetVersion}");
 
         if (!File.Exists(runOptions.FileName))
         {
@@ -22,7 +24,7 @@ internal class Program
         FileReader fileReader = new();
         JObject jsonContent = fileReader.ReadFileIntoJObject(runOptions.FileName);
 
-        string dotNetVersion = GetVersion(jsonContent, runOptions.DotNetVersion);
+        string dotNetVersion = Tools.GetVersion(jsonContent, runOptions.DotNetVersion);
 
         if (!fileReader.DotNetVersionSupported(dotNetVersion, jsonContent))
         {
@@ -32,19 +34,34 @@ internal class Program
 
         List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
         List<Package> packages = PackageParser.GetPackages(jsonContent, dotNetVersion);
-        Console.WriteLine("\r\nTop Level Packages:");
+        Console.WriteLine(WriteOutput(topDependencies, packages));
+
+        return 0;
+    }
+
+    private static string WriteOutput(List<Dependency> topDependencies, List<Package> packages)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("\r\nTop Level Packages:");
+        // List of top-level packages that we want to investigate.
         List<string> packagesOfInterest = new List<string>();
+        // Go through all the top-level packages
         foreach (Dependency dependency in topDependencies)
         {
-            Console.WriteLine($"{dependency.Name} - {dependency.Version}");
+            sb.AppendLine($"{dependency.Name} - {dependency.Version}");
+            // Get all the packages that reference this top-level package.
             List<Package> flist = packages.Where(x => x.HasDependencyWithName(dependency.Name)).ToList();
-            foreach(Package package in flist)
+            foreach (Package package in flist)
             {
+                // Get the version asked for (may be lower than actual version)
                 Dependency deps = package.Dependencies.Where(x => x.Name == dependency.Name).First();
                 string verMatch = deps.Version == dependency.Version ? "<= MATCH!" : string.Empty;
-                Console.WriteLine($"\t{package.Name} - {package.Version} {verMatch}");
+                sb.AppendLine($"\t{package.Name} - {package.Version} {verMatch}");
+                // If another package refereces this package, and it is the same version.
+                // We may not need to make this a top-level package
                 if (deps.Version == dependency.Version)
                 {
+                    // Avoid duplcation
                     string packageNameAndVersion = $"{package.Name} - {package.Version}";
                     if (!packagesOfInterest.Contains(packageNameAndVersion))
                     {
@@ -53,29 +70,15 @@ internal class Program
                 }
             }
         }
+        // If there are any top-level packages to investigate, list them here.
         if (packagesOfInterest.Count > 0)
         {
-            Console.WriteLine("\r\nPackages of Interest:");
+            sb.AppendLine("\r\nPackages of Interest:");
             foreach (string package in packagesOfInterest)
             {
-                Console.WriteLine(package);
+                sb.AppendLine(package);
             }
         }
-
-        return 0;
+        return sb.ToString();
     }
-
-    private static string GetVersion(JObject parsed, string dotNetVersion)
-    {
-        if (string.IsNullOrWhiteSpace(dotNetVersion))
-        {
-            JToken items = parsed["projectFileDependencyGroups"];
-            if (items.Count() == 1)
-            {
-                dotNetVersion = ((JProperty)items.First).Name;
-            }
-        }
-        return dotNetVersion;
-    }
-
 }
