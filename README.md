@@ -128,3 +128,23 @@ Right now I'm just copying the output of the [Mermaid Live Editor](https://merma
 Sometimes the graph can get more complex. For example Newtonsoft.Json.
 
 ![Left to Right graph of Newtonsoft.Json](/assets/images/Newtonsoft.Json.png)
+
+# parse.project.assets.toplevel
+
+Analizes Top-Level NuGet packages. At work we want to avoid including NuGet packages as top-level packages 
+where the same version is referenced from another top-level package. We don't like to do that because it 
+makes it harder to upgrade packages. This tool is to help me discover such packages.
+
+```bash
+C:\FilesToParse>parse.project.assets.toplevel -f C:\repo\myprogram\obj\
+C:\repo\myprogram\obj\project.assets.json
+
+Top Level Packages:
+Microsoft.EntityFrameworkCore.Design - 7.0.10
+        Microsoft.EntityFrameworkCore.Tools - 7.0.10 <= MATCH!
+Microsoft.EntityFrameworkCore.SqlServer - 7.0.10
+Microsoft.EntityFrameworkCore.Tools - 7.0.10
+
+Packages of Interest:
+Microsoft.EntityFrameworkCore.Tools - 7.0.10
+```
