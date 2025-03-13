@@ -11,7 +11,7 @@
             return $"Level,Package Name,Top?,Version,Child\r\n";
         }
 
-        public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel)
+        public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel, bool controlsChildVersion)
         {
             //string tabs = tabCount == 0 ? string.Empty : new string(' ', tabCount * 2);
             string topLevelX = isTopLevel ? "X" : string.Empty;

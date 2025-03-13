@@ -60,22 +60,23 @@
         public string MakeHead(string packageName, bool vertical)
         {
             string directionSymbol = vertical ? "TB" : "LR";
-            return $"---\r\ntitle: {packageName}\r\n---\r\nflowchart {directionSymbol}\r\n  classDef TopLevel fill: gold\r\n  classDef BottomLevel fill: silver\r\n";
+            return $"---\r\ntitle: {packageName}\r\n---\r\nflowchart {directionSymbol}\r\n  classDef TopLevel fill: gold, color: black\r\n  classDef TargetLevel fill: silver, color: black\r\n";
         }
 
-        public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel)
+        public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel, bool controlsChildVersion)
         {
             if (IsDuplicate(parentPackage, packageName, actualVersion))
             {
                 return string.Empty;
             }
             AddToDuplicateList(parentPackage, packageName, actualVersion);
+            string lineSegment = controlsChildVersion ? "==>" : "-.-> ";
             if (string.IsNullOrWhiteSpace(parentPackage))
             {
-                string className = (tabCount == 0 && !isTopLevel) ? ":::BottomLevel" : string.Empty;
+                string className = (tabCount == 0 && !isTopLevel) ? ":::TargetLevel" : string.Empty;
                 return $"  {GetMermaidSymbol(packageName, isTopLevel, actualVersion)}{className}\r\n";
             }
-            return $"  {GetMermaidSymbol(parentPackage, isTopLevel)} --> |\"`{version}`\"| {GetMermaidSymbol(packageName, isTopLevel, actualVersion)}\r\n"; 
+            return $"  {GetMermaidSymbol(parentPackage, isTopLevel)} {lineSegment} |\"`{version}`\"| {GetMermaidSymbol(packageName, isTopLevel, actualVersion)}\r\n"; 
         }
     }
 }

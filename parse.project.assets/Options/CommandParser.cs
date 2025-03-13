@@ -9,7 +9,7 @@ internal class CommandParser
     {
         string packageName = string.Empty;
         string fileName = string.Empty;
-        string dotNetVersion = "net6.0";
+        string dotNetVersion = "net8.0";
         int levels = int.MaxValue;
         bool vertical = false;
         FormatOptions format = FormatOptions.text;

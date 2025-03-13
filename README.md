@@ -102,18 +102,18 @@ C:\FilesToParse>_
 ```shell
 C:\FilesToParse>parse.project.assets -p System.Security.Principal.windows -r mermaid
 flowchart LR
-  classDef TopLevel fill: gold
-  classDef BottomLevel fill: silver
+  classDef TopLevel fill: gold, color: black
+  classDef TargetLevel fill: silver, color: black
   MNode1("`System.Security.Principal.Windows
-4.7.0`"):::BottomLevel
-  MNode1 --> |"`4.7.0`"| MNode2("`Microsoft.Win32.Registry
+4.7.0`"):::TargetLevel
+  MNode1 ==> |"`4.7.0`"| MNode2("`Microsoft.Win32.Registry
 4.7.0`")
-  MNode2 --> |"`4.7.0`"| MNode3{{"`**System.Data.SqlClient**
+  MNode2 -.-> |"`4.6.0`"| MNode3{{"`**System.Data.SqlClient**
 4.8.5`"}}:::TopLevel
-  MNode1 --> |"`4.7.0`"| MNode3
-  MNode1 --> |"`4.7.0`"| MNode4("`System.Security.AccessControl
+  MNode1 -.-> |"`4.6.0`"| MNode3
+  MNode1 ==> |"`4.7.0`"| MNode4("`System.Security.AccessControl
 4.7.0`")
-  MNode4 --> |"`4.7.0`"| MNode2
+  MNode4 ==> |"`4.7.0`"| MNode2
 
 C:\FilesToParse>_
 ```
@@ -133,7 +133,7 @@ Sometimes the graph can get more complex. For example Newtonsoft.Json.
 
 Analizes Top-Level NuGet packages. At work we want to avoid including NuGet packages as top-level packages 
 where the same version is referenced from another top-level package. We don't like to do that because it 
-makes it harder to upgrade packages. This tool is to help me discover such packages.
+makes it harder to upgrade packages. This tool is to help me discover such packages.F
 
 ```bash
 C:\FilesToParse>parse.project.assets.toplevel -f C:\repo\myprogram\obj\
@@ -147,4 +147,5 @@ Microsoft.EntityFrameworkCore.Tools - 7.0.10
 
 Packages of Interest:
 Microsoft.EntityFrameworkCore.Tools - 7.0.10
+C:\FilesToParse>
 ```
