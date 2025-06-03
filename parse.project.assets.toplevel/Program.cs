@@ -4,6 +4,7 @@ using parse.project.assets.shared.Read;
 using parse.project.assets.toplevel.Options;
 using System.Text;
 using parse.project.assets.shared.Options;
+using parse.project.assets.toplevel.Formatters;
 
 namespace parse.project.assets.toplevel;
 
@@ -13,11 +14,14 @@ internal class Program
     {
         RunOptions runOptions = CommandParser.GetRunOptions(args);
 
-        Console.WriteLine($"{runOptions.FileName} {runOptions.DotNetVersion}");
+        IOutputFormatter outputFormatter = new TextFormatter();
+
+
+        Console.WriteLine(outputFormatter.FileAndVersion(runOptions.FileName, runOptions.DotNetVersion, false));
 
         if (!File.Exists(runOptions.FileName))
         {
-            Console.WriteLine($"Didn't find the file {runOptions.FileName}");
+            Console.WriteLine(outputFormatter.Error($"Didn't find the file {runOptions.FileName}"));
             return 1;
         }
 
@@ -28,21 +32,21 @@ internal class Program
 
         if (!fileReader.DotNetVersionSupported(dotNetVersion, jsonContent))
         {
-            Console.WriteLine($"Didn't find support for the .NET version {runOptions.DotNetVersion}");
+            Console.WriteLine(outputFormatter.Error($"Didn't find support for the .NET version {runOptions.DotNetVersion}"));
             return 1;
         }
 
         List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
         List<Package> packages = PackageParser.GetPackages(jsonContent, dotNetVersion);
-        Console.WriteLine(WriteOutput(topDependencies, packages));
+        Console.WriteLine(WriteOutput(topDependencies, packages, outputFormatter));
 
         return 0;
     }
 
-    private static string WriteOutput(List<Dependency> topDependencies, List<Package> packages)
+    private static string WriteOutput(List<Dependency> topDependencies, List<Package> packages, IOutputFormatter outputFormatter)
     {
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine("\r\nTop Level Packages:");
+        sb.AppendLine(outputFormatter.MakeHead());
         // List of top-level packages that we want to investigate.
         List<string> packagesOfInterest = new List<string>();
         // Go through all the top-level packages

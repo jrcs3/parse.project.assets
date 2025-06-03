@@ -1,6 +1,6 @@
 ﻿namespace parse.project.assets.Formatters
 {
-    internal interface IOutputFormatter
+    public interface IOutputFormatter
     {
         string MakeJobDescription(string packageName, string fileName, string dotNetVersion, int levels);
         string MakeHead(string packageName, bool vertical);

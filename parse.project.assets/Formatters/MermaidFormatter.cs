@@ -1,6 +1,6 @@
 ﻿namespace parse.project.assets.Formatters
 {
-    internal class MermaidFormatter : IOutputFormatter
+    public class MermaidFormatter : IOutputFormatter
     {
         public MermaidFormatter()
         {

@@ -133,11 +133,10 @@ Sometimes the graph can get more complex. For example Newtonsoft.Json.
 
 Analizes Top-Level NuGet packages. At work we want to avoid including NuGet packages as top-level packages 
 where the same version is referenced from another top-level package. We don't like to do that because it 
-makes it harder to upgrade packages. This tool is to help me discover such packages.F
+makes it harder to upgrade packages. This tool is to help me discover such packages.
 
 ```bash
 C:\FilesToParse>parse.project.assets.toplevel -f C:\repo\myprogram\obj\
-C:\repo\myprogram\obj\project.assets.json
 
 Top Level Packages:
 Microsoft.EntityFrameworkCore.Design - 7.0.10

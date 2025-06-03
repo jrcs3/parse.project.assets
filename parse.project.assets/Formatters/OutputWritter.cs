@@ -3,7 +3,7 @@ using System.Text;
 
 namespace parse.project.assets.Formatters;
 
-internal class OutputWritter
+public class OutputWritter
 {
     /// <remarks>
     /// I'm working from the bottom to the top.
