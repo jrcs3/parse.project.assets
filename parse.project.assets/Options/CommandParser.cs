@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using parse.project.assets.Formatters;
+using parse.project.assets.formatters;
 
 namespace parse.project.assets.Options;
 

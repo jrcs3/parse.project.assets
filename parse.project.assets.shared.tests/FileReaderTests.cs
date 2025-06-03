@@ -50,7 +50,7 @@ namespace parse.project.assets.shared.Tests
             };
 
             // Act
-            var correctedName = _fileReader.CorrectTarget("newtonsoft.json", packages);
+            var correctedName = FileReader.CorrectTarget("newtonsoft.json", packages);
 
             // Assert
             Assert.AreEqual("Newtonsoft.Json", correctedName);
@@ -67,7 +67,7 @@ namespace parse.project.assets.shared.Tests
             };
 
             // Act
-            var correctedName = _fileReader.CorrectTarget("oldtonsoft.json", packages);
+            var correctedName = FileReader.CorrectTarget("oldtonsoft.json", packages);
 
             // Assert
             Assert.AreEqual("oldtonsoft.json", correctedName);

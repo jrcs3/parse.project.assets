@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 using Newtonsoft.Json.Linq;
-using parse.project.assets.Formatters;
+using parse.project.assets.formatters;
 using parse.project.assets.Options;
 using parse.project.assets.shared.Parse;
 using parse.project.assets.shared.Read;
@@ -36,7 +36,7 @@ internal class Program
         List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
         List<Package> packages = PackageParser.GetPackages(jsonContent, dotNetVersion);
 
-        runOptions.PackageName = fileReader.CorrectTarget(runOptions.PackageName, packages);
+        runOptions.PackageName = FileReader.CorrectTarget(runOptions.PackageName, packages);
 
         string output = OutputWritter.ParentsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, false, runOptions.Vertical, runOptions.Formatter);
         //string output = ChildsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);

@@ -23,7 +23,7 @@ public class FileReader
     /// support prividing package names in any case the user give it in.
     /// Also, it is easier to deal with casing in one place.
     /// </remarks>
-    public string CorrectTarget(string target, List<Package> packages)
+    public static string CorrectTarget(string target, List<Package> packages)
     {
         string? correctedName = packages.Where(x => x.Name.Trim().ToLower() == target.Trim().ToLower()).FirstOrDefault()?.Name;
         if (!string.IsNullOrWhiteSpace(correctedName))

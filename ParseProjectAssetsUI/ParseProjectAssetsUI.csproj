@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\parse.project.assets.formatters\parse.project.assets.formatters.csproj" />
     <ProjectReference Include="..\parse.project.assets.shared\parse.project.assets.shared.csproj" />
-    <ProjectReference Include="..\parse.project.assets\parse.project.assets.csproj" />
   </ItemGroup>
 
 </Project>

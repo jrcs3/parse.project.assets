@@ -36,7 +36,7 @@ namespace ParseProjectAssetsUI
             lblSolutionPath = new Label();
             btnParse = new Button();
             lblPackageName = new Label();
-            txtPackageName = new TextBox();
+            txtPackageName = new ComboBox();
             ((System.ComponentModel.ISupportInitialize)webView21).BeginInit();
             SuspendLayout();
             // 
@@ -103,6 +103,7 @@ namespace ParseProjectAssetsUI
             // txtPackageName
             // 
             txtPackageName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtPackageName.FormattingEnabled = true;
             txtPackageName.Location = new Point(107, 38);
             txtPackageName.Name = "txtPackageName";
             txtPackageName.Size = new Size(681, 23);
@@ -113,8 +114,8 @@ namespace ParseProjectAssetsUI
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(lblPackageName);
             Controls.Add(txtPackageName);
+            Controls.Add(lblPackageName);
             Controls.Add(btnParse);
             Controls.Add(lblSolutionPath);
             Controls.Add(txtFileName);
@@ -136,6 +137,6 @@ namespace ParseProjectAssetsUI
         private Label lblSolutionPath;
         private Button btnParse;
         private Label lblPackageName;
-        private TextBox txtPackageName;
+        private ComboBox txtPackageName;
     }
 }

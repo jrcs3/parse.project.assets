@@ -1,7 +1,7 @@
 ﻿using parse.project.assets.shared.Parse;
 using System.Text;
 
-namespace parse.project.assets.Formatters;
+namespace parse.project.assets.formatters;
 
 public class OutputWritter
 {
