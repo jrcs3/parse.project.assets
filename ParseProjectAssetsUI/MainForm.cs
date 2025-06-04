@@ -60,7 +60,13 @@ public partial class MainForm : Form
         if (fileName != null && txtFileName.Text != fileName)
         {
             txtFileName.Text = fileName;
-            JObject jsonContent = LoadJsonContent(fileName);
+            JObject? jsonContent = LoadJsonContent(fileName);
+
+            if (jsonContent == null)
+            {
+                MessageBox.Show("project.assets.json not found in the obj folder.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             string dotNetVersion = GetVersion(jsonContent, string.Empty);
 
@@ -77,11 +83,15 @@ public partial class MainForm : Form
         }
     }
 
-    private static JObject LoadJsonContent(string fileName)
+    private static JObject? LoadJsonContent(string fileName)
     {
         string filePath = Path.GetDirectoryName(fileName);
         string projectAssetsJsonPath = Path.Combine(filePath, "obj", "project.assets.json");
 
+        if (!File.Exists(projectAssetsJsonPath))
+        {
+            return null;
+        }
         FileReader fileReader = new();
         JObject jsonContent = fileReader.ReadFileIntoJObject(projectAssetsJsonPath);
         return jsonContent;
@@ -97,23 +107,41 @@ public partial class MainForm : Form
         string filePath = Path.GetDirectoryName(fileName);
         string projectName = Path.GetFileNameWithoutExtension(fileName);
 
-        bool isVertial = false;
+        bool isVertial = chkVert.Checked;
 
         string packageName = txtPackageName.Text.Trim();
 
         FileReader fileReader = new();
-        JObject jsonContent = LoadJsonContent(fileName);
+        JObject? jsonContent = LoadJsonContent(fileName);
 
-        string dotNetVersion = GetVersion(jsonContent,string.Empty);
+        if (jsonContent == null)
+        {
+            MessageBox.Show("project.assets.json not found in the obj folder.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
+        string dotNetVersion = GetVersion(jsonContent, string.Empty);
 
         List<Dependency> topDependencies = DependencyParser.GetTopDependencies(jsonContent, dotNetVersion);
         List<Package> packages = PackageParser.GetPackages(jsonContent, dotNetVersion);
 
         packageName = FileReader.CorrectTarget(packageName, packages);
 
+        if (string.IsNullOrWhiteSpace(packageName))
+        {
+            MessageBox.Show("Please select a package to visualize.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
         IOutputFormatter FormatOptions= new MermaidFormatter();
 
         string output = OutputWritter.ParentsStringText(string.Empty, packageName, packages, topDependencies, string.Empty, 0, int.MaxValue, false, isVertial, FormatOptions);
+
+        if (string.IsNullOrWhiteSpace(output))
+        {
+            MessageBox.Show("No dependencies found for the selected package.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
 
         string htmlContent = @"<html>
   <body>

@@ -38,6 +38,10 @@ public class OutputWritter
             header = formatter.MakeHead(thisPackage, vertical);
         }
 
+        if (sb.Length == 0)
+        {
+            return string.Empty;
+        }
         return header + sb.ToString();
     }
 
