@@ -39,6 +39,8 @@ namespace ParseProjectAssetsUI
             txtPackageName = new ComboBox();
             chkVert = new CheckBox();
             chkGroupTop = new CheckBox();
+            btnCopyMermaid = new Button();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)webView21).BeginInit();
             SuspendLayout();
             // 
@@ -85,11 +87,11 @@ namespace ParseProjectAssetsUI
             // btnParse
             // 
             btnParse.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnParse.Location = new Point(564, 415);
+            btnParse.Location = new Point(525, 415);
             btnParse.Name = "btnParse";
             btnParse.Size = new Size(75, 23);
             btnParse.TabIndex = 6;
-            btnParse.Text = "&Parse";
+            btnParse.Text = "&Render";
             btnParse.UseVisualStyleBackColor = true;
             btnParse.Click += btnParse_Click;
             // 
@@ -133,11 +135,36 @@ namespace ParseProjectAssetsUI
             chkGroupTop.Text = "Group Top Level";
             chkGroupTop.UseVisualStyleBackColor = true;
             // 
+            // btnCopyMermaid
+            // 
+            btnCopyMermaid.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCopyMermaid.Enabled = false;
+            btnCopyMermaid.Location = new Point(606, 415);
+            btnCopyMermaid.Name = "btnCopyMermaid";
+            btnCopyMermaid.Size = new Size(114, 23);
+            btnCopyMermaid.TabIndex = 9;
+            btnCopyMermaid.Text = "Copy Mermaid";
+            btnCopyMermaid.UseVisualStyleBackColor = true;
+            btnCopyMermaid.Click += btnCopyMermaid_Click;
+            // 
+            // button1
+            // 
+            button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            button1.Location = new Point(725, 415);
+            button1.Name = "button1";
+            button1.Size = new Size(63, 23);
+            button1.TabIndex = 10;
+            button1.Text = "E&xit";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(button1);
+            Controls.Add(btnCopyMermaid);
             Controls.Add(chkGroupTop);
             Controls.Add(chkVert);
             Controls.Add(txtPackageName);
@@ -166,5 +193,7 @@ namespace ParseProjectAssetsUI
         private ComboBox txtPackageName;
         private CheckBox chkVert;
         private CheckBox chkGroupTop;
+        private Button btnCopyMermaid;
+        private Button button1;
     }
 }

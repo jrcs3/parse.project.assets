@@ -69,7 +69,10 @@ public class MermaidFormatter : IOutputFormatter
             returnValue += "  subgraph \"Top Level Packages\"\r\n";
             foreach (Dependency dep in topDependencies)
             {
-                returnValue += $"      {GetMermaidSymbol(dep.Name, true)}\r\n";
+                if (_symbolLookup.ContainsKey(dep.Name))
+                {
+                    returnValue += $"      {GetMermaidSymbol(dep.Name, true)}\r\n";
+                }
             }
             returnValue += "  end\r\n\r\n";
         }

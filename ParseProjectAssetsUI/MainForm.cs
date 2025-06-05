@@ -134,7 +134,7 @@ public partial class MainForm : Form
             return;
         }
 
-        IOutputFormatter FormatOptions= new MermaidFormatter();
+        IOutputFormatter FormatOptions = new MermaidFormatter();
 
         string output = OutputWritter.ParentsStringText(string.Empty, packageName, packages, topDependencies, string.Empty, 0, int.MaxValue, false, isVertial, groupTopLevel, FormatOptions);
 
@@ -174,4 +174,13 @@ public partial class MainForm : Form
         return dotNetVersion;
     }
 
+    private void btnCopyMermaid_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void button1_Click(object sender, EventArgs e)
+    {
+        System.Windows.Forms.Application.Exit();
+    }
 }
