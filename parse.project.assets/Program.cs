@@ -38,7 +38,7 @@ internal class Program
 
         runOptions.PackageName = FileReader.CorrectTarget(runOptions.PackageName, packages);
 
-        string output = OutputWritter.ParentsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, false, runOptions.Vertical, runOptions.Formatter);
+        string output = OutputWritter.ParentsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, false, runOptions.Vertical, false, runOptions.Formatter);
         //string output = ChildsStringText(string.Empty, runOptions.PackageName, packages, topDependencies, string.Empty, 0, runOptions.Levels, runOptions.Formatter);
 
         if (string.IsNullOrWhiteSpace(output))

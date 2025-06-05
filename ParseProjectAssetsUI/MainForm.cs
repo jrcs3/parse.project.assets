@@ -108,6 +108,7 @@ public partial class MainForm : Form
         string projectName = Path.GetFileNameWithoutExtension(fileName);
 
         bool isVertial = chkVert.Checked;
+        bool groupTopLevel = chkGroupTop.Checked;
 
         string packageName = txtPackageName.Text.Trim();
 
@@ -135,7 +136,7 @@ public partial class MainForm : Form
 
         IOutputFormatter FormatOptions= new MermaidFormatter();
 
-        string output = OutputWritter.ParentsStringText(string.Empty, packageName, packages, topDependencies, string.Empty, 0, int.MaxValue, false, isVertial, FormatOptions);
+        string output = OutputWritter.ParentsStringText(string.Empty, packageName, packages, topDependencies, string.Empty, 0, int.MaxValue, false, isVertial, groupTopLevel, FormatOptions);
 
         if (string.IsNullOrWhiteSpace(output))
         {

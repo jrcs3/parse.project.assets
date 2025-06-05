@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using parse.project.assets.shared.Parse;
+using System.Text;
 
 namespace parse.project.assets.formatters;
 
@@ -19,7 +20,7 @@ public class TextFormatter : IOutputFormatter
         return superHeader;
     }
 
-    public string MakeHead(string packageName, bool vertical)
+    public string MakeHead(string packageName, bool vertical, bool groupTopLevel, List<Dependency> topDependencies)
     {
         return $"{string.Empty,-60}\tTop?\tVersion\tChild\r\n{string.Empty,-60}\t====\t=======\t=====\r\n";
     }

@@ -8,7 +8,7 @@ public class OutputWritter
     /// <remarks>
     /// I'm working from the bottom to the top.
     /// </remarks>
-    public static string ParentsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, bool controlsChildVersion, bool vertical, IOutputFormatter formatter)
+    public static string ParentsStringText(string parentPackage, string thisPackage, List<Package> packages, List<Dependency> topDependencies, string version, int tabCount, int levels, bool controlsChildVersion, bool vertical, bool groupTopLevel, IOutputFormatter formatter)
     {
         if (tabCount > levels)
         {
@@ -29,13 +29,13 @@ public class OutputWritter
         {
             string childVersion = p.Dependencies.Where(x => x.Name == thisPackage).FirstOrDefault()?.Version ?? string.Empty;
             bool childControlsChildVersion = (childVersion == actualVersion);
-            sb.Append(ParentsStringText(thisPackage, p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, childControlsChildVersion, vertical, formatter));
+            sb.Append(ParentsStringText(thisPackage, p.Name, packages, topDependencies, childVersion, tabCount + 1, levels, childControlsChildVersion, vertical, groupTopLevel, formatter));
         }
 
         string header = string.Empty;
         if (tabCount == 0 && sb.Length > 0)
         {
-            header = formatter.MakeHead(thisPackage, vertical);
+            header = formatter.MakeHead(thisPackage, vertical, groupTopLevel, topDependencies);
         }
 
         if (sb.Length == 0)

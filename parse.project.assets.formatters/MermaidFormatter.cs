@@ -1,4 +1,6 @@
-﻿namespace parse.project.assets.formatters;
+﻿using parse.project.assets.shared.Parse;
+
+namespace parse.project.assets.formatters;
 
 public class MermaidFormatter : IOutputFormatter
 {
@@ -57,10 +59,21 @@ public class MermaidFormatter : IOutputFormatter
         return string.Empty;
     }
 
-    public string MakeHead(string packageName, bool vertical)
+    public string MakeHead(string packageName, bool vertical, bool groupTopLevel, List<Dependency> topDependencies)
     {
         string directionSymbol = vertical ? "TB" : "LR";
-        return $"---\r\ntitle: {packageName}\r\n---\r\nflowchart {directionSymbol}\r\n  classDef TopLevel fill: gold, color: black\r\n  classDef TargetLevel fill: silver, color: black\r\n";
+        string returnValue = $"---\r\ntitle: {packageName}\r\n---\r\nflowchart {directionSymbol}\r\n  classDef TopLevel fill: gold, color: black\r\n  classDef TargetLevel fill: silver, color: black\r\n";
+
+        if (groupTopLevel)
+        {
+            returnValue += "  subgraph \"Top Level Packages\"\r\n";
+            foreach (Dependency dep in topDependencies)
+            {
+                returnValue += $"      {GetMermaidSymbol(dep.Name, true)}\r\n";
+            }
+            returnValue += "  end\r\n\r\n";
+        }
+        return returnValue;
     }
 
     public string MakeLine(string parentPackage, string packageName, string version, string actualVersion, int tabCount, bool isTopLevel, bool controlsChildVersion)

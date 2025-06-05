@@ -38,6 +38,7 @@ namespace ParseProjectAssetsUI
             lblPackageName = new Label();
             txtPackageName = new ComboBox();
             chkVert = new CheckBox();
+            chkGroupTop = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)webView21).BeginInit();
             SuspendLayout();
             // 
@@ -107,25 +108,37 @@ namespace ParseProjectAssetsUI
             txtPackageName.FormattingEnabled = true;
             txtPackageName.Location = new Point(107, 38);
             txtPackageName.Name = "txtPackageName";
-            txtPackageName.Size = new Size(605, 23);
+            txtPackageName.Size = new Size(493, 23);
             txtPackageName.TabIndex = 4;
             // 
             // chkVert
             // 
             chkVert.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             chkVert.AutoSize = true;
-            chkVert.Location = new Point(718, 40);
+            chkVert.Location = new Point(606, 40);
             chkVert.Name = "chkVert";
             chkVert.Size = new Size(64, 19);
             chkVert.TabIndex = 7;
             chkVert.Text = "Vertical";
             chkVert.UseVisualStyleBackColor = true;
             // 
+            // chkGroupTop
+            // 
+            chkGroupTop.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            chkGroupTop.AutoSize = true;
+            chkGroupTop.Location = new Point(676, 40);
+            chkGroupTop.Name = "chkGroupTop";
+            chkGroupTop.Size = new Size(112, 19);
+            chkGroupTop.TabIndex = 8;
+            chkGroupTop.Text = "Group Top Level";
+            chkGroupTop.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(chkGroupTop);
             Controls.Add(chkVert);
             Controls.Add(txtPackageName);
             Controls.Add(lblPackageName);
@@ -152,5 +165,6 @@ namespace ParseProjectAssetsUI
         private Label lblPackageName;
         private ComboBox txtPackageName;
         private CheckBox chkVert;
+        private CheckBox chkGroupTop;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace parse.project.assets.formatters;
+﻿using parse.project.assets.shared.Parse;
+
+namespace parse.project.assets.formatters;
 
 public class CsvFormatter : IOutputFormatter
 {
@@ -6,7 +8,7 @@ public class CsvFormatter : IOutputFormatter
     {
         return string.Empty;
     }
-    public string MakeHead(string packageName, bool vertical)
+    public string MakeHead(string packageName, bool vertical, bool groupTopLevel, List<Dependency> topDependencies)
     {
         return $"Level,Package Name,Top?,Version,Child\r\n";
     }
