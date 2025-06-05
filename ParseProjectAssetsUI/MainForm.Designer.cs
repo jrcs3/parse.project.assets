@@ -52,14 +52,14 @@ namespace ParseProjectAssetsUI
             webView21.DefaultBackgroundColor = Color.WhiteSmoke;
             webView21.Location = new Point(-1, 74);
             webView21.Name = "webView21";
-            webView21.Size = new Size(801, 335);
+            webView21.Size = new Size(1248, 335);
             webView21.TabIndex = 5;
             webView21.ZoomFactor = 1D;
             // 
             // btnSelectFile
             // 
             btnSelectFile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnSelectFile.Location = new Point(754, 8);
+            btnSelectFile.Location = new Point(1201, 8);
             btnSelectFile.Name = "btnSelectFile";
             btnSelectFile.Size = new Size(34, 23);
             btnSelectFile.TabIndex = 2;
@@ -72,7 +72,7 @@ namespace ParseProjectAssetsUI
             txtFileName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtFileName.Location = new Point(99, 9);
             txtFileName.Name = "txtFileName";
-            txtFileName.Size = new Size(649, 23);
+            txtFileName.Size = new Size(1096, 23);
             txtFileName.TabIndex = 1;
             // 
             // lblSolutionPath
@@ -87,7 +87,7 @@ namespace ParseProjectAssetsUI
             // btnParse
             // 
             btnParse.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnParse.Location = new Point(525, 415);
+            btnParse.Location = new Point(972, 415);
             btnParse.Name = "btnParse";
             btnParse.Size = new Size(75, 23);
             btnParse.TabIndex = 6;
@@ -110,14 +110,16 @@ namespace ParseProjectAssetsUI
             txtPackageName.FormattingEnabled = true;
             txtPackageName.Location = new Point(107, 38);
             txtPackageName.Name = "txtPackageName";
-            txtPackageName.Size = new Size(493, 23);
+            txtPackageName.Size = new Size(940, 23);
             txtPackageName.TabIndex = 4;
             // 
             // chkVert
             // 
             chkVert.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             chkVert.AutoSize = true;
-            chkVert.Location = new Point(606, 40);
+            chkVert.Checked = true;
+            chkVert.CheckState = CheckState.Checked;
+            chkVert.Location = new Point(1053, 40);
             chkVert.Name = "chkVert";
             chkVert.Size = new Size(64, 19);
             chkVert.TabIndex = 7;
@@ -128,7 +130,7 @@ namespace ParseProjectAssetsUI
             // 
             chkGroupTop.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             chkGroupTop.AutoSize = true;
-            chkGroupTop.Location = new Point(676, 40);
+            chkGroupTop.Location = new Point(1123, 40);
             chkGroupTop.Name = "chkGroupTop";
             chkGroupTop.Size = new Size(112, 19);
             chkGroupTop.TabIndex = 8;
@@ -138,8 +140,7 @@ namespace ParseProjectAssetsUI
             // btnCopyMermaid
             // 
             btnCopyMermaid.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnCopyMermaid.Enabled = false;
-            btnCopyMermaid.Location = new Point(606, 415);
+            btnCopyMermaid.Location = new Point(1053, 415);
             btnCopyMermaid.Name = "btnCopyMermaid";
             btnCopyMermaid.Size = new Size(114, 23);
             btnCopyMermaid.TabIndex = 9;
@@ -150,7 +151,7 @@ namespace ParseProjectAssetsUI
             // button1
             // 
             button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button1.Location = new Point(725, 415);
+            button1.Location = new Point(1172, 415);
             button1.Name = "button1";
             button1.Size = new Size(63, 23);
             button1.TabIndex = 10;
@@ -162,7 +163,7 @@ namespace ParseProjectAssetsUI
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1247, 450);
             Controls.Add(button1);
             Controls.Add(btnCopyMermaid);
             Controls.Add(chkGroupTop);

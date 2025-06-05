@@ -44,7 +44,7 @@ public partial class MainForm : Form
         switch (fileExtention)
         {
             case ".csproj":
-                ParseCsProj(fileName);
+                ParseCsProjBase(fileName, WriteMermaidOutputToWindow);
                 break;
             case ".sln":
                 ParseSolution(fileName);
@@ -102,7 +102,8 @@ public partial class MainForm : Form
         throw new NotImplementedException();
     }
 
-    private void ParseCsProj(string fileName)
+
+    private void ParseCsProjBase(string fileName, Action<string, string, string> writeMermaidOutput)
     {
         string filePath = Path.GetDirectoryName(fileName);
         string projectName = Path.GetFileNameWithoutExtension(fileName);
@@ -144,9 +145,15 @@ public partial class MainForm : Form
             return;
         }
 
+        writeMermaidOutput(projectName, output, dotNetVersion);
+    }
+
+    private void WriteMermaidOutputToWindow(string projectName, string output, string dotNetVersion)
+    {
         string htmlContent = @"<html>
   <body>
     <h2>{ProjectName}</h2>
+    <h3>{DotNetVersion}</h3>
     <pre class=""mermaid"">
            {Content}
     </pre>
@@ -158,7 +165,7 @@ public partial class MainForm : Form
   </body>
 </html>";
 
-        webView21.NavigateToString(htmlContent.Replace("{Content}", output).Replace("{ProjectName}", projectName));
+        webView21.NavigateToString(htmlContent.Replace("{Content}", output).Replace("{ProjectName}", projectName).Replace("{DotNetVersion}", dotNetVersion));
     }
 
     private static string GetVersion(JObject parsed, string dotNetVersion)
@@ -176,11 +183,26 @@ public partial class MainForm : Form
 
     private void btnCopyMermaid_Click(object sender, EventArgs e)
     {
+        string fileName = txtFileName.Text;
+        string fileExtention = Path.GetExtension(fileName).ToLowerInvariant();
+        switch (fileExtention)
+        {
+            case ".csproj":
+                ParseCsProjBase(fileName, WriteMermaidOutputClipboard);
+                break;
+            default:
+                MessageBox.Show("Unsupported file type. Please select a .csproj or .sln file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                break;
+        }
+    }
 
+    private void WriteMermaidOutputClipboard(string projectName, string output, string dotNetVersion)
+    {
+        Clipboard.SetText(output);
     }
 
     private void button1_Click(object sender, EventArgs e)
     {
-        System.Windows.Forms.Application.Exit();
+        Application.Exit();
     }
 }

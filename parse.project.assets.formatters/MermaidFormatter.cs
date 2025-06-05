@@ -14,6 +14,8 @@ public class MermaidFormatter : IOutputFormatter
     private int _currentIndex;
     private readonly List<string> _duplicatesList;
 
+    private const string _seperator = "<br/>";
+
     private string GetMermaidSymbol(string packageName, bool isTopLevel, string version= "")
     {
         if (_symbolLookup.ContainsKey(packageName))
@@ -30,7 +32,7 @@ public class MermaidFormatter : IOutputFormatter
         {
             return $"{symbol}{boxOpen}{packageNameDisplay}{boxClose}";
         }
-        return $"{symbol}{boxOpen}\"`{packageNameDisplay}\r\n{version}`\"{boxClose}";
+        return $"{symbol}{boxOpen}\"`{packageNameDisplay}{_seperator}{version}`\"{boxClose}";
     }
 
     #region Prevent duplicate connections
@@ -66,7 +68,7 @@ public class MermaidFormatter : IOutputFormatter
 
         if (groupTopLevel)
         {
-            returnValue += "  subgraph \"Top Level Packages\"\r\n";
+            returnValue += "\r\n  subgraph \"Top Level Packages\"\r\n";
             foreach (Dependency dep in topDependencies)
             {
                 if (_symbolLookup.ContainsKey(dep.Name))
