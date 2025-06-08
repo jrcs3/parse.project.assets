@@ -40,14 +40,19 @@ public partial class MainForm : Form
     private void btnParse_Click(object sender, EventArgs e)
     {
         string fileName = txtFileName.Text;
+        RenderAndWriteMermaid(fileName, WriteMermaidOutputToWindow);
+    }
+
+    private void RenderAndWriteMermaid(string fileName, Action<string, string, string> writeMermaidOutputToWindow)
+    {
         string fileExtention = Path.GetExtension(fileName).ToLowerInvariant();
         switch (fileExtention)
         {
             case ".csproj":
-                ParseCsProjBase(fileName, WriteMermaidOutputToWindow);
+                ParseCsProjBase(fileName, writeMermaidOutputToWindow);
                 break;
             case ".sln":
-                ParseSolution(fileName);
+                ParseSolution(fileName, writeMermaidOutputToWindow);
                 break;
             default:
                 MessageBox.Show("Unsupported file type. Please select a .csproj or .sln file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -97,7 +102,7 @@ public partial class MainForm : Form
         return jsonContent;
     }
 
-    private void ParseSolution(string fileName)
+    private void ParseSolution(string fileName, Action<string, string, string> writeMermaidOutput)
     {
         throw new NotImplementedException();
     }
@@ -184,16 +189,7 @@ public partial class MainForm : Form
     private void btnCopyMermaid_Click(object sender, EventArgs e)
     {
         string fileName = txtFileName.Text;
-        string fileExtention = Path.GetExtension(fileName).ToLowerInvariant();
-        switch (fileExtention)
-        {
-            case ".csproj":
-                ParseCsProjBase(fileName, WriteMermaidOutputClipboard);
-                break;
-            default:
-                MessageBox.Show("Unsupported file type. Please select a .csproj or .sln file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                break;
-        }
+        RenderAndWriteMermaid(fileName, WriteMermaidOutputClipboard);
     }
 
     private void WriteMermaidOutputClipboard(string projectName, string output, string dotNetVersion)
@@ -204,5 +200,23 @@ public partial class MainForm : Form
     private void button1_Click(object sender, EventArgs e)
     {
         Application.Exit();
+    }
+
+    private void txtPackageName_SelectedValueChanged(object sender, EventArgs e)
+    {
+        string fileName = txtFileName.Text;
+        RenderAndWriteMermaid(fileName, WriteMermaidOutputToWindow);
+    }
+
+    private void chkVert_CheckStateChanged(object sender, EventArgs e)
+    {
+        string fileName = txtFileName.Text;
+        RenderAndWriteMermaid(fileName, WriteMermaidOutputToWindow);
+    }
+
+    private void chkGroupTop_CheckedChanged(object sender, EventArgs e)
+    {
+        string fileName = txtFileName.Text;
+        RenderAndWriteMermaid(fileName, WriteMermaidOutputToWindow);
     }
 }

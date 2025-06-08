@@ -112,6 +112,7 @@ namespace ParseProjectAssetsUI
             txtPackageName.Name = "txtPackageName";
             txtPackageName.Size = new Size(940, 23);
             txtPackageName.TabIndex = 4;
+            txtPackageName.SelectedValueChanged += txtPackageName_SelectedValueChanged;
             // 
             // chkVert
             // 
@@ -125,6 +126,7 @@ namespace ParseProjectAssetsUI
             chkVert.TabIndex = 7;
             chkVert.Text = "Vertical";
             chkVert.UseVisualStyleBackColor = true;
+            chkVert.CheckStateChanged += chkVert_CheckStateChanged;
             // 
             // chkGroupTop
             // 
@@ -136,6 +138,7 @@ namespace ParseProjectAssetsUI
             chkGroupTop.TabIndex = 8;
             chkGroupTop.Text = "Group Top Level";
             chkGroupTop.UseVisualStyleBackColor = true;
+            chkGroupTop.CheckedChanged += chkGroupTop_CheckedChanged;
             // 
             // btnCopyMermaid
             // 
